@@ -36,7 +36,7 @@ import axios from 'axios'
 const isTest = location.host.match(/36.7|localhost|21.80/) != null
 //接入服务器接口地址根目录
 //http://localhost:5675/Clientashx
-export const server_base_url =isTest ? 'http://localhost:5675/Clientashx/' : 'http://47.96.90.116:12223/Clientashx/';
+export const server_base_url =isTest ? 'http://47.96.90.116:12223/Clientashx/' : 'http://47.96.90.116:12223/Clientashx/';
 
 export default function fetch(options) {
   return new Promise((resolve, reject) => {

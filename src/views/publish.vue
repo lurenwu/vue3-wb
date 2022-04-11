@@ -15,9 +15,9 @@
         :show-indicators="false"
       >
         <van-swipe-item v-for="(item, index) in logList" :key="index"
-          >{{ item.create_time }} {{ item.brand_name }}查看了此信息，{{
+          >{{ item.create_time }} {{ item.brand_name }}查看了此信息,{{
             info.status == "0" ? "未跟进" : info.status == "1" ? "已跟进" : ""
-          }}</van-swipe-item
+          }}&nbsp;&nbsp;<span @click="handleGoRouter('logList',{id:item.id,info_id:item.info_id,selfBrandCode:selfBrandCode,brandCode:brandCode})">查看</span></van-swipe-item
         >
       </van-swipe>
     </van-notice-bar>
@@ -350,7 +350,9 @@ export default {
     const handleSelectBrand = async () => {
       state.show = true;
     };
-
+    const handleGoRouter = async (path,query) => {
+      router.push({ path: path, query: query})
+    }
     const handleTree = async (item) => {
       state.activeIds = [];
       state.brandList.forEach((list) => {
@@ -382,6 +384,7 @@ export default {
       handleTree,
       handlePopup,
       handleGetTimeList,
+      handleGoRouter
     };
   },
 };

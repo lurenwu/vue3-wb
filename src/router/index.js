@@ -69,6 +69,14 @@ const router = createRouter({
       redirect: '/home'
     },
     {
+      path: '/logList',
+      name: 'logList',
+      component: () => import(/* webpackChunkName: "logList" */ '@/views/logList.vue'),
+      meta: {
+        index: 1
+      }
+    },
+    {
       path: '/home',
       name: 'home',
       component: () => import(/* webpackChunkName: "home" */ '@/views/Home.vue'),
