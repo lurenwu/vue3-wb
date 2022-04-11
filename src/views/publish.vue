@@ -410,4 +410,9 @@ export default {
     }
   }
 }
+.notice-swipe {
+  height: 40px;
+  line-height: 40px;
+  font-size: 12px;
+}
 </style>
