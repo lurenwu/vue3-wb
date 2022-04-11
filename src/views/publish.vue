@@ -190,6 +190,8 @@ export default {
       activeIds: [],
       logList: [],
       brandList: [],
+      brand_code:"",
+      self_brand_code:"",
       timeList: [],
       id: "",
       info: {
@@ -206,10 +208,12 @@ export default {
     });
 
     onMounted(async () => {
-      const { type, id } = route.query;
+      const { type, id,selfBrandCode } = route.query;
       state.type = type;
       state.id = id || "";
       state.brand_code = getLocal("brand_code");
+      state.self_brand_code = selfBrandCode;
+
       state.brandList = JSON.parse(getLocal("brandList"));
 
       if (id) await handleGetInfo();
@@ -219,6 +223,8 @@ export default {
     const handleGetLogList = async () => {
       const params = {
         info_id: state.id,
+        brand_code: state.brand_code,
+        self_brand_code: state.self_brand_code,
       };
       await getLogInfo(params).then((data) => {
         state.logList = data.list;

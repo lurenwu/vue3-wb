@@ -11,7 +11,6 @@
 </template>
 
 <script>
-import { Dialog } from "vant";
 
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -44,22 +43,7 @@ export default {
     const router = useRouter()
     const goBack = () => {
       if(props.isComfirmBack) {
-        Dialog.confirm({
-          title: '系统提示',
-          message:
-            '确定不跟进吗',
-        }).then(() => {
-          ctx.emit('callback')
-          if (!props.back) {
-            router.go(-1)
-          } else {
-            router.push({ path: props.back })
-          }
-          console.log(1)
-        })
-        .catch(() => {
-          // on cancel
-        });
+       ctx.emit('callback')
       } else {
         if (!props.back) {
           router.go(-1)

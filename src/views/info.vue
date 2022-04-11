@@ -10,7 +10,7 @@
     <van-notice-bar
       left-icon="volume-o"
       :scrollable="false"
-      v-if="logList.length > 0"
+      v-if="logList.length > 0 && selfBrandCode === ''"
     >
       <van-swipe
         vertical
@@ -164,6 +164,8 @@ export default {
       info: {},
       logList: [],
       type: "",
+      brand_code:"",
+      self_brand_code:"",
       id: "",
     });
 
@@ -171,8 +173,8 @@ export default {
       const { type, id, selfBrandCode, brandCode } = route.query;
       state.type = type;
       state.id = id;
-      state.selfBrandCode = selfBrandCode;
-      state.brandCode = brandCode;
+      state.self_brand_code = selfBrandCode;
+      state.brand_code = brandCode;
 
       handleGetInfo();
       handleGetLogList();
@@ -202,8 +204,8 @@ export default {
       const params = {
         id: state.id,
         status: result ? 1 : 0,
-        brand_code: state.brandCode,
-        self_brand_code: state.selfBrandCode,
+        brand_code: state.brand_code,
+        self_brand_code: state.self_brand_code,
         curStatus: state.info.status,
       };
       await updateKehuInfoStatus(params).then(() => {
@@ -224,8 +226,8 @@ export default {
     const handleGetInfo = async () => {
       const params = {
         info_id: state.id,
-        self_brand_code: state.selfBrandCode,
-        brand_code: state.brandCode,
+        self_brand_code: state.self_brand_code,
+        brand_code: state.brand_code,
       };
       await getInfo(params).then((data) => {
         state.info = data.info;
@@ -243,6 +245,8 @@ export default {
     const handleGetLogList = async () => {
       const params = {
         info_id: state.id,
+        brand_code: state.brand_code,
+        self_brand_code: state.self_brand_code,
       };
       await getLogInfo(params).then((data) => {
         state.logList = data.list;
