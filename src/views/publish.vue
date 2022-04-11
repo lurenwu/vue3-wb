@@ -3,7 +3,24 @@
 <template>
   <div class="address-edit-box">
     <s-header :name="`${type == 'add' ? '发布信息' : '编辑信息'}`"></s-header>
-   
+   <van-notice-bar
+      left-icon="volume-o"
+      :scrollable="false"
+      v-if="logList.length > 0"
+    >
+      <van-swipe
+        vertical
+        class="notice-swipe"
+        :autoplay="3000"
+        :show-indicators="false"
+      >
+        <van-swipe-item v-for="(item, index) in logList" :key="index"
+          >{{ item.create_time }} {{item.brand_name}}查看了此信息，{{
+            info.status == "0" ? "未跟进" : info.status == "1" ? "已跟进" : ""
+          }}</van-swipe-item
+        >
+      </van-swipe>
+    </van-notice-bar>
     <div class="van-address-edit">
       <div class="">
         <van-form >
@@ -138,7 +155,7 @@ import { reactive, onMounted, toRefs, ref } from "vue";
 import { Toast } from "vant";
 import sHeader from "@/components/SimpleHeader";
 import { useRoute, useRouter } from "vue-router";
-import { editInfo, addInfo,getTimeList,getInfo } from '@/service/index'
+import { editInfo, addInfo,getTimeList,getInfo,getLogInfo } from '@/service/index'
 import {verify} from "@/common/js/verify";
 import { getLocal } from '@/common/js/utils'
 
@@ -157,7 +174,7 @@ export default {
       type: 'add',
       show: false,
       activeIds:[],
-     
+      logList: [],
       brandList: [],
       timeList:[],
       id:"",
@@ -167,7 +184,7 @@ export default {
         name:"",
         phone:"",
         fangan:2,
-        is_all_see: 1
+        is_all_see: "1"
       },
     });
   
@@ -180,10 +197,19 @@ export default {
       state.brandList = JSON.parse(getLocal("brandList"));
 
       if(id) await handleGetInfo();
-       await  handleGetTimeList()
+      await  handleGetTimeList()
+      handleGetLogList();
 
      
     });
+    const handleGetLogList = async () => {
+      const params = {
+        info_id: state.id,
+      };
+      await getLogInfo(params).then((data) => {
+        state.logList = data.list;
+      });
+    };
     const handleGetInfo = async () => {
     
       const params = {
@@ -240,13 +266,13 @@ export default {
         })
       })
       if(choosebrandList.length === 0) {
-        state.info.is_all_see = 1
+        state.info.is_all_see = "1"
       }
       state.info.see_list = choosebrandList.toString()
       console.log(choosebrandList.toString())
     }
     const onSave = async () => {
-      console.log(verify)
+      console.log(state.info)
         const params = {
           address: state.info.address,
           name:state.info.name,

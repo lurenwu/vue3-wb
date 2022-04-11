@@ -94,7 +94,7 @@ html, body {
   z-index: 1000;
 }
 .btn {
-  background: #cc322c !important;
-  border: 1px solid #cc322c !important;
+  background: #797EF6 !important;
+  border: 1px solid #797EF6 !important;
 }
 </style>

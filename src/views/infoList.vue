@@ -19,7 +19,7 @@ import { reactive, onMounted, toRefs } from 'vue'
 import sHeader from '@/components/SimpleHeader'
 import infoItem from '@/components/infoItem'
 
-import { getInfoList,getSelfInfoList } from '@/service/index'
+import { getInfoList } from '@/service/index'
 import { useRoute, useRouter } from 'vue-router'
 import { getLocal } from '@/common/js/utils'
 
@@ -78,15 +78,16 @@ export default {
         brand_code: state.brand_code,
         self_brand_code: state.self_brand_code
       }
-      if(state.self_brand_code !== state.brand_code) {
-        getInfoList(params).then((data)=>{
-          state.infoList = data.list;
-        });
-      } else {
-        getSelfInfoList(params).then((data)=>{
-          state.infoList = data.list;
-        });
-      }
+      getInfoList(params).then((data)=>{
+        state.infoList = data.list;
+      });
+      // if(state.self_brand_code !== state.brand_code) {
+      
+      // } else {
+      //   getSelfInfoList(params).then((data)=>{
+      //     state.infoList = data.list;
+      //   });
+      // }
     };
     const handleGoRouter = async (path,query) => {
       router.push({ path: path, query: query})

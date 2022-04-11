@@ -1,11 +1,14 @@
 
 
 <template>
-  <div class="login">
+  <div class="login login-container">
     <s-header noback :name="type == 'login' ? '登录' : '注册'" ></s-header>
     <div class="logo"></div>
     <div v-if="type == 'login'" class="login-body login">
+
       <van-form @submit="onSubmit">
+      <div class="form-box">
+
         <van-field
           v-model="username"
           name="username"
@@ -21,10 +24,13 @@
           placeholder="密码"
           :rules="[{ required: true, message: '请填写密码' }]"
         />
+      </div>
+
         <div style="margin: 16px;">
           <van-button class="btn" round block color="#1989fa" native-type="submit">登录</van-button>
         </div>
       </van-form>
+
     </div>
   >
    
@@ -83,6 +89,16 @@ export default {
 </script>
 
 <style lang="less">
+.login-container {
+  width: 100vw;
+  height: 100vh;
+    background: url("../assets/login-bg.jpg") no-repeat;
+    .form-box {
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 30px;
+    }
+}
   .login {
     .logo {
       width: 120px;
