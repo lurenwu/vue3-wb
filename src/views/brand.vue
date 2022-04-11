@@ -6,7 +6,7 @@
     <div class="chart-box">
       <i class="iconfont icon-a-dakai1x" @click="handleGoRouter('/echart')"></i>
     </div>
-    <div class="brand-container" v-for="(item, index) in brandList" :key="index" @click="handleGoRouter('/infoList',{brand_code:item.brand_code})">
+    <div class="brand-container" v-for="(item, index) in brandList" :key="index"  @click="handleGoRouter('/infoList',{brand_code:item.brand_code})" >
       <div class="brand-item">
         <div class="img">
           <img :src="item.url">

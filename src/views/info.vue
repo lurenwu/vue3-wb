@@ -10,7 +10,7 @@
     <van-notice-bar
       left-icon="volume-o"
       :scrollable="false"
-      v-if="logList.length > 0 && selfBrandCode === ''"
+      v-if="logList.length > 0 && self_brand_code === 'admin'"
     >
       <van-swipe
         vertical

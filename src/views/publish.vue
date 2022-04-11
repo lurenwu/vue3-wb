@@ -247,7 +247,7 @@ export default {
           item.text = item.brand_name;
           item.children = [];
           state.timeList.forEach((time) => {
-            if (time.from === item.brand_code) {
+            if (time.from === item.brand_code ) {
               time.is_show = item.is_show === "1";
               item.children.push(time);
             }
