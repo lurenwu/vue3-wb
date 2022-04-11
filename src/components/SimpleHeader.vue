@@ -3,7 +3,7 @@
 <template>
   <header class="simple-header van-hairline--bottom">
     <i v-if="!isback" class="nbicon nbfanhui" @click="goBack"></i>
-    <i v-else>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</i>
+    <i v-else></i>
     <div class="simple-header-name">{{ name }}</div>
     <i class="iconfont" :class="iconRight ? iconRight : ''" @click="handleRight"></i>
   </header>

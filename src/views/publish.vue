@@ -3,7 +3,7 @@
 <template>
   <div class="address-edit-box">
     <s-header :name="`${type == 'add' ? '发布信息' : '编辑信息'}`"></s-header>
-   <van-notice-bar
+    <van-notice-bar
       left-icon="volume-o"
       :scrollable="false"
       v-if="logList.length > 0"
@@ -15,7 +15,7 @@
         :show-indicators="false"
       >
         <van-swipe-item v-for="(item, index) in logList" :key="index"
-          >{{ item.create_time }} {{item.brand_name}}查看了此信息，{{
+          >{{ item.create_time }} {{ item.brand_name }}查看了此信息，{{
             info.status == "0" ? "未跟进" : info.status == "1" ? "已跟进" : ""
           }}</van-swipe-item
         >
@@ -23,19 +23,18 @@
     </van-notice-bar>
     <div class="van-address-edit">
       <div class="">
-        <van-form >
+        <van-form>
           <van-cell-group inset>
-              <van-field
-                v-model="info.address"
-                rows="2"
-                autosize
-                label="*地址"
-                type="info.address"
-                maxlength="100"
-                placeholder="请填写地址"
-                show-word-limit
-
-              />
+            <van-field
+              v-model="info.address"
+              rows="2"
+              autosize
+              label="*地址"
+              type="info.address"
+              maxlength="100"
+              placeholder="请填写地址"
+              show-word-limit
+            />
             <van-field
               v-model="info.name"
               name="客户姓名"
@@ -104,15 +103,19 @@
                   <van-radio name="0">全包</van-radio>
                   <van-radio name="1">半包</van-radio>
                   <van-radio name="2">全案</van-radio>
-
                 </van-radio-group>
               </template>
             </van-field>
             <van-field name="radio" label="可见范围">
               <template #input>
-                <van-radio-group v-model="info.is_all_see" direction="horizontal">
+                <van-radio-group
+                  v-model="info.is_all_see"
+                  direction="horizontal"
+                >
                   <van-radio name="1">全部可见</van-radio>
-                  <van-radio name="0" @click="handleSelectBrand">指定可见</van-radio>
+                  <van-radio name="0" @click="handleSelectBrand"
+                    >指定可见</van-radio
+                  >
                 </van-radio-group>
               </template>
             </van-field>
@@ -137,15 +140,20 @@
         </van-form>
       </div>
     </div>
-   
-    <van-popup v-model:show="show"  @close="handlePopup" position="bottom" :style="{ height: '600px' }">
+
+    <van-popup
+      v-model:show="show"
+      @close="handlePopup"
+      position="bottom"
+      :style="{ height: '600px' }"
+    >
       <van-tree-select
-      height="600"
-      @click-item="handleTree"
-      v-model:active-id="activeIds"
-      v-model:main-active-index="activeIndex"
-      :items="brandList"
-    />
+        height="600"
+        @click-item="handleTree"
+        v-model:active-id="activeIds"
+        v-model:main-active-index="activeIndex"
+        :items="brandList"
+      />
     </van-popup>
   </div>
 </template>
@@ -155,9 +163,15 @@ import { reactive, onMounted, toRefs, ref } from "vue";
 import { Toast } from "vant";
 import sHeader from "@/components/SimpleHeader";
 import { useRoute, useRouter } from "vue-router";
-import { editInfo, addInfo,getTimeList,getInfo,getLogInfo } from '@/service/index'
-import {verify} from "@/common/js/verify";
-import { getLocal } from '@/common/js/utils'
+import {
+  editInfo,
+  addInfo,
+  getTimeList,
+  getInfo,
+  getLogInfo,
+} from "@/service/index";
+import { verify } from "@/common/js/verify";
+import { getLocal } from "@/common/js/utils";
 
 export default {
   components: {
@@ -167,40 +181,40 @@ export default {
     // const activeIds = ref([2]);
     const activeIndex = ref(0);
     const items = [];
-    const route = useRoute()
-    const router = useRouter()
+    const route = useRoute();
+    const router = useRouter();
 
     const state = reactive({
-      type: 'add',
+      type: "add",
       show: false,
-      activeIds:[],
+      activeIds: [],
       logList: [],
       brandList: [],
-      timeList:[],
-      id:"",
-      info:{
-        address:"",
-        nature: 0,
-        name:"",
-        phone:"",
-        fangan:2,
-        is_all_see: "1"
+      timeList: [],
+      id: "",
+      info: {
+        address: "",
+        nature: "0",
+        name: "",
+        phone: "",
+        fangan: "0",
+        is_all_see: "1",
+        mianji: "",
+        style: "",
+        jieduan: "",
       },
     });
-  
 
     onMounted(async () => {
-      const { type,id } = route.query
-      state.type = type
-      state.id = id || '';
+      const { type, id } = route.query;
+      state.type = type;
+      state.id = id || "";
       state.brand_code = getLocal("brand_code");
       state.brandList = JSON.parse(getLocal("brandList"));
 
-      if(id) await handleGetInfo();
-      await  handleGetTimeList()
+      if (id) await handleGetInfo();
+      await handleGetTimeList();
       handleGetLogList();
-
-     
     });
     const handleGetLogList = async () => {
       const params = {
@@ -211,77 +225,72 @@ export default {
       });
     };
     const handleGetInfo = async () => {
-    
       const params = {
         info_id: state.id,
       };
-      await getInfo(params).then((data)=>{
+      await getInfo(params).then((data) => {
         state.info = data.info;
-        
-        
-      })
+      });
     };
     const handleGetTimeList = async () => {
-      await getTimeList().then((data)=>{
+      await getTimeList().then((data) => {
         state.timeList = data.list;
-      
-        state.brandList.forEach(item=>{
+
+        state.brandList.forEach((item) => {
           item.is_show = false;
           item.text = item.brand_name;
-          item.children = []
-          state.timeList.forEach(time=>{
-            if(time.from === item.brand_code) {
-              time.is_show = item.is_show === '1';
+          item.children = [];
+          state.timeList.forEach((time) => {
+            if (time.from === item.brand_code) {
+              time.is_show = item.is_show === "1";
               item.children.push(time);
             }
-          })
-        })
-        if(state.info.is_all_see == 0) {
+          });
+        });
+        if (state.info.is_all_see == 0) {
           var arrSee = state.info.see_list.split(",");
-          arrSee.forEach(see=>{
+          arrSee.forEach((see) => {
             var brand_code = see.split(" ")[0];
             var day = see.split(" ")[1];
-            state.brandList.forEach(item=>{
-              item.children.forEach(child=>{
-                if(child.from === brand_code && child.day === day) {
+            state.brandList.forEach((item) => {
+              item.children.forEach((child) => {
+                if (child.from === brand_code && child.day === day) {
                   state.activeIds.push(child.id);
-                  child.is_show = true
+                  child.is_show = true;
                 }
-              })
-            })
-           
-          })
+              });
+            });
+          });
         }
       });
-     
     };
-    const handlePopup = async() => {
-      console.log(2)
-      var choosebrandList = []
-      state.brandList.forEach(item=>{
-        item.children.forEach(child=>{
-          if(child.is_show) {
-            choosebrandList.push(child.from + " " + child.day)
+    const handlePopup = async () => {
+      console.log(2);
+      var choosebrandList = [];
+      state.brandList.forEach((item) => {
+        item.children.forEach((child) => {
+          if (child.is_show) {
+            choosebrandList.push(child.from + " " + child.day);
           }
-        })
-      })
-      if(choosebrandList.length === 0) {
-        state.info.is_all_see = "1"
+        });
+      });
+      if (choosebrandList.length === 0) {
+        state.info.is_all_see = "1";
       }
-      state.info.see_list = choosebrandList.toString()
-      console.log(choosebrandList.toString())
-    }
+      state.info.see_list = choosebrandList.toString();
+      console.log(choosebrandList.toString());
+    };
     const onSave = async () => {
-      console.log(state.info)
-        const params = {
-          address: state.info.address,
-          name:state.info.name,
-          phone:state.info.phone,
-          mianji:state.info.mianji,
-          style:state.info.style,
-          jieduan:state.info.jieduan
-        };
-       
+      console.log(state.info);
+      const params = {
+        address: state.info.address,
+        name: state.info.name,
+        phone: state.info.phone,
+        mianji: state.info.mianji,
+        style: state.info.style,
+        jieduan: state.info.jieduan,
+      };
+
       var done = true;
       var result = "";
       for (var item in params) {
@@ -291,53 +300,69 @@ export default {
 
         result = verify(item, params[item]);
         if (!result.done) {
-          Toast.fail(result.value)
+          Toast.fail(result.value);
         }
         done = result.done;
       }
       if (!done) {
         return;
       }
-      await (state.type == 'add' ? addInfo({brand_code: state.brand_code ,...state.info}) : editInfo({brand_code: state.brand_code ,...state.info})).then(()=>{
+      if (
+        !/^(0|86|17951)?(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$/.test(
+          state.info.phone
+        )
+      ) {
+        return Toast.fail("请输入正确的手机号");
+      }
+      if (state.info.phone2) {
+        if (
+          !/^(0|86|17951)?(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$/.test(
+            state.info.phone2
+          )
+        ) {
+          return Toast.fail("请输入正确的手机号");
+        }
+      }
+
+      await (state.type == "add"
+        ? addInfo({ brand_code: state.brand_code, ...state.info })
+        : editInfo({ brand_code: state.brand_code, ...state.info })
+      ).then(() => {
         Toast("保存成功");
         setTimeout(() => {
-          router.back()
-        }, 1000)
-
+          router.back();
+        }, 1000);
       });
-     
 
       // setTimeout(() => {
       //   router.back()
       // }, 1000)
     };
-   
+
     const handleSelectBrand = async () => {
       state.show = true;
-    
     };
-  
+
     const handleTree = async (item) => {
-      state.activeIds = []
-      state.brandList.forEach((list)=>{
-        if(list.brand_code !== item.from) return;
-        list.children.forEach((see)=>{
-          if(item.id === see.id) {
+      state.activeIds = [];
+      state.brandList.forEach((list) => {
+        if (list.brand_code !== item.from) return;
+        list.children.forEach((see) => {
+          if (item.id === see.id) {
             list.is_show = !see.is_show;
             see.is_show = !see.is_show;
           } else {
-            see.is_show = false
+            see.is_show = false;
           }
-        })
-      })
-      state.brandList.forEach((list)=>{
-        list.children.forEach((see)=>{
-          if(see.is_show) {
+        });
+      });
+      state.brandList.forEach((list) => {
+        list.children.forEach((see) => {
+          if (see.is_show) {
             state.activeIds.push(see.id);
           }
-        })
-      })
-     
+        });
+      });
     };
     return {
       items,
@@ -348,7 +373,7 @@ export default {
       handleGetInfo,
       handleTree,
       handlePopup,
-      handleGetTimeList
+      handleGetTimeList,
     };
   },
 };
@@ -367,7 +392,6 @@ export default {
   .van-address-edit {
     .van-cell {
       font-size: 12px;
-
     }
     .van-button--danger {
       background: @primary;
