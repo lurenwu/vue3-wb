@@ -167,15 +167,16 @@ export default {
       brand_code:"",
       self_brand_code:"",
       id: "",
+      info_id:""
     });
 
     onMounted(async () => {
-      const { type, id, selfBrandCode, brandCode } = route.query;
+      const { type, id,info_id, selfBrandCode, brandCode } = route.query;
       state.type = type;
       state.id = id;
       state.self_brand_code = selfBrandCode;
       state.brand_code = brandCode;
-
+      state.info_id = info_id;
       handleGetInfo();
       handleGetLogList();
     });
@@ -203,6 +204,7 @@ export default {
     const handleUpdateStatus = async (result) => {
       const params = {
         id: state.id,
+        info_id: state.info_id,
         status: result ? 1 : 0,
         brand_code: state.brand_code,
         self_brand_code: state.self_brand_code,
@@ -211,10 +213,15 @@ export default {
       await updateKehuInfoStatus(params).then(() => {
         if (result) {
           Toast("跟进成功");
+          setTimeout(function(){
+            window.location.reload();
+          },1000)
+        } else {
+          setTimeout(() => {
+            router.back();
+          }, 1000);
         }
-        setTimeout(() => {
-          router.back();
-        }, 1000);
+       
       });
     };
     const handleRead = async () => {
@@ -244,7 +251,7 @@ export default {
     };
     const handleGetLogList = async () => {
       const params = {
-        info_id: state.id,
+        info_id: state.info_id,
         brand_code: state.brand_code,
         self_brand_code: state.self_brand_code,
       };

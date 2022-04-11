@@ -2,7 +2,7 @@
 
 <template>
   <div>
-    <div class="info-box" v-for="(item, index) in infoList" :key="index" @click="handleGoRouter((selfBrandCode !== brandCode ? 'info':'publish'),{id:item.id,selfBrandCode:selfBrandCode,brandCode:brandCode})">
+    <div class="info-box" v-for="(item, index) in infoList" :key="index" @click="handleGoRouter((selfBrandCode !== brandCode ? 'info':'publish'),{id:item.id,info_id:item.info_id,selfBrandCode:selfBrandCode,brandCode:brandCode})">
         <div class="info-item">
            <div class="item">
             <div class="title">{{item.address}}</div>
