@@ -5,12 +5,28 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      redirect: '/home'
+      redirect: '/login'
+    },
+    {
+      path: '/echart',
+      name: 'echart',
+      component: () => import(/* webpackChunkName: "echart" */ '@/views/echart.vue'),
+      meta: {
+        index: 1
+      }
     },
     {
       path: '/info',
       name: 'info',
       component: () => import(/* webpackChunkName: "info" */ '@/views/info.vue'),
+      meta: {
+        index: 1
+      }
+    },
+    {
+      path: '/search',
+      name: 'search',
+      component: () => import(/* webpackChunkName: "info" */ '@/views/search.vue'),
       meta: {
         index: 1
       }
@@ -39,14 +55,7 @@ const router = createRouter({
         index: 1
       }
     },
-    {
-      path: '/home',
-      name: 'home',
-      component: () => import(/* webpackChunkName: "home" */ '@/views/Home.vue'),
-      meta: {
-        index: 1
-      }
-    },
+  
     {
       path: '/login',
       name: 'login',
@@ -55,6 +64,19 @@ const router = createRouter({
         index: 1
       }
     },
+    {
+      path: '/',
+      redirect: '/home'
+    },
+    {
+      path: '/home',
+      name: 'home',
+      component: () => import(/* webpackChunkName: "home" */ '@/views/Home.vue'),
+      meta: {
+        index: 1
+      }
+    },
+   
     {
       path: '/about',
       name: 'about',

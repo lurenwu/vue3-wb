@@ -3,7 +3,17 @@
 <template>
   <div class="address-edit-box">
     <s-header name="查看信息" isComfirmBack @callback="handleFollow(false)"></s-header>
-    <div class="van-address-edit">
+    <van-notice-bar left-icon="volume-o" :scrollable="false" v-if="logList.length > 0">
+      <van-swipe
+        vertical
+        class="notice-swipe"
+        :autoplay="3000"
+        :show-indicators="false"
+      >
+        <van-swipe-item v-for="(item, index) in logList" :key="index">{{item.create_time}} 品牌方查看了此信息，{{info.status == '0' ? '未跟进' : info.status == '1' ? '已跟进': ''}}</van-swipe-item>
+      </van-swipe>
+    </van-notice-bar>
+    <div >
       <div class="">
         <van-form >
           <van-cell-group inset>
@@ -23,7 +33,9 @@
                 readonly
                 label="性质"
               />
+              <div   v-if="info.status == '1'">
             <van-field
+              
               v-model="info.name"
               name="客户姓名"
               label="客户姓名"
@@ -85,7 +97,7 @@
               readonly
             />
            
-            <van-cell-group inset>
+            
               <van-field
                 v-model="info.remark"
                 rows="2"
@@ -95,10 +107,10 @@
                 maxlength="100"
                 readonly
               />
-            </van-cell-group>
+              </div>
           </van-cell-group>
           <div style="margin: 16px">
-            <van-button round block type="primary" @click="onFollow(true)">
+            <van-button class="btn" round block type="primary" v-if="info.status == '' || info.status == '0'" @click="handleFollow(true)">
               跟进
             </van-button>
           </div>
@@ -112,10 +124,10 @@
 import { reactive, onMounted, toRefs } from "vue";
 import { Toast,Dialog } from "vant";
 import sHeader from "@/components/SimpleHeader";
-import { useRoute } from "vue-router";
-import { get, post } from '@/service/index'
+import { useRoute,useRouter } from "vue-router";
+import { updateKehuInfoRead, updateKehuInfoStatus, getInfo,getLogInfo } from '@/service/index'
 import { natureList,fanganList } from '@/common/js/utils'
-import { getLocal } from '@/common/js/utils'
+import { setLocal,getLocal } from '@/common/js/utils'
 
 export default {
   components: {
@@ -123,90 +135,112 @@ export default {
   },
   setup() {
     const route = useRoute()
+    const router = useRouter()
+
     const state = reactive({
       natureList:natureList,
       fanganList:fanganList,
-      info: {}
+      info: {},
+      logList:[],
+      type:"",
+      id:"",
+
     });
 
     onMounted(async () => {
-      const kehuId = getLocal('kehuId')
-      const { type,infoId } = route.query
+      const { type,id,selfBrandCode,brandCode } = route.query
       state.type = type
-      state.infoId = infoId
-      state.kehuId = kehuId;
-      state.info = {
-        address:"哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈哈",
-        nature: 0,
-        name:"22",
-        phone:"33",
-        phone2:"33444",
-        fangan:2,
-        mianji: '120平方',
-        style: '日式',
-        jieduan: '还没开始',
-        yusuan: '100W',
-        design_name: '陈林',
-        design_phone: '15158696740',
-        remark: '的撒打算说的',
-        see_list: '1,2',
-        is_all_see: 0,
-        see_type: 3,
-        brand_code: 'dsa'
-      }
-      state.info.fanganDes = state.fanganList.filter(item=> item.value === state.info.fangan)[0].name
-      state.info.natureDes = state.natureList.filter(item=> item.value === state.info.nature)[0].name
-      handleRead()
-      getInfo();
+      state.id = id
+      state.selfBrandCode = selfBrandCode
+      state.brandCode = brandCode
+    
+    
+      handleGetInfo();
+      handleGetLogList();
     });
-
-    const onFollow = async () => {
+    
+    const handleFollow = async (result) => {
+      if(state.info.status !== '' && !result) {
+        router.back()
+        return;
+      }
+      var tipNum = parseInt(getLocal('tipNum')) + 1
+      if(tipNum > 3 && !result) {
+        handleUpdateStatus(result)
+        return
+      }
+      setLocal('tipNum', tipNum)
       Dialog.confirm({
         title: '系统提示',
         message:
-          `确定跟进吗`,
-      }).then(() => {
-        handleFollow(true)
+          `确定${!result ? '不': ''}跟进吗`,
+      }).then(async () => {
+        handleUpdateStatus(result)
       })
       .catch(() => {
       });
+     
     };
-    const handleFollow = async (result) => {
-      await post({t:"updateKehuInfoState",state: result ? 1 : 0}).then(()=>{
-        console.log(111)
-        Toast("保存成功");
-      });
+     const handleUpdateStatus = async (result) => {
+       const params = {
+        id: state.id,
+        status: result ? 1 : 0,
+        brand_code : state.brandCode,
+        curStatus: state.info.status
+      };
+        await updateKehuInfoStatus(params).then(()=>{
+          if(result) {
+            Toast("跟进成功");
+          } 
+          setTimeout(() => {
+            router.back()
+          }, 1000)
+        }); 
     };
     const handleRead = async () => {
       const params = {
-        t: 'insertKehuInfoRead',
-        kehu_id: state.kehuId,
-        info_id: state.infoId
+        id: state.id,
+      
       };
-      post(params).then(()=>{
+      updateKehuInfoRead(params).then(()=>{
         
       });
     };
-    const getInfo = async () => {
+     const handleGetInfo = async () => {
     
       const params = {
-        t: "getInfo",
-        info_id: "",
+        info_id: state.id,
+        self_brand_code: state.selfBrandCode,
+        brand_code:state.brandCode,
       };
-      await get(params);
-      Toast("保存成功");
-      // setTimeout(() => {
-      //   router.back()
-      // }, 1000)
+      await getInfo(params).then((data)=>{
+        state.info = data.info;
+        state.info.fanganDes = state.fanganList.filter(item=> item.value === state.info.fangan)[0].name;
+        state.info.natureDes = state.natureList.filter(item=> item.value === state.info.nature)[0].name;
+        if(state.info.isread === '0') {
+          handleRead()
+        }
+      })
     };
-   
+    const handleGetLogList = async () => {
+    
+      const params = {
+        info_id: state.id,
+      };
+      await getLogInfo(params).then((data)=>{
+
+        state.logList = data.list;
+      })
+    };
    
     
     return {
       ...toRefs(state),
-      getInfo,
-      onFollow,
-      handleRead
+      handleGetInfo,
+      handleFollow,
+      handleRead,
+      handleUpdateStatus,
+      handleGetLogList
     };
   },
 };
@@ -236,4 +270,8 @@ export default {
     }
   }
 }
+.notice-swipe {
+  height: 40px;
+  line-height: 40px;
+} 
 </style>

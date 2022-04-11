@@ -2,7 +2,7 @@
 
 <template>
   <div class="login">
-    <s-header :name="type == 'login' ? '登录' : '注册'" :back="'/home'"></s-header>
+    <s-header noback :name="type == 'login' ? '登录' : '注册'" ></s-header>
     <div class="logo"></div>
     <div v-if="type == 'login'" class="login-body login">
       <van-form @submit="onSubmit">
@@ -22,7 +22,7 @@
           :rules="[{ required: true, message: '请填写密码' }]"
         />
         <div style="margin: 16px;">
-          <van-button round block color="#1989fa" native-type="submit">登录</van-button>
+          <van-button class="btn" round block color="#1989fa" native-type="submit">登录</van-button>
         </div>
       </van-form>
     </div>
@@ -34,8 +34,10 @@
 <script>
 import { reactive, toRefs } from 'vue'
 import sHeader from '@/components/SimpleHeader'
-import { post } from '@/service/index'
+import { login } from '@/service/index'
 import { setLocal } from '@/common/js/utils'
+import { Toast } from 'vant'
+
 export default {
   setup() {
    
@@ -49,13 +51,23 @@ export default {
 
     // 提交登录或注册表单
     const onSubmit = async (values) => {
-      const { data } = await post({
+      // setLocal('brand_code', "htydb")
+      setLocal('tipNum', 0)
+      login({
         "username": values.username,
         "password": values.password
-      })
-      setLocal('token', data)
+      }).then((data)=>{
+        if(data.list.length === 0) {
+          Toast.fail('用户名或者密码错误，请检查~')
+        } else {
+          window.location.href = '/#/brand'
+          setLocal('userInfo', JSON.stringify(data.list[0]))
+          setLocal('brand_code', data.list[0].brand_code)
+        }
+      });
+     
+
       // 需要刷新页面，否则 axios.js 文件里的 token 不会被重置
-      window.location.href = '/brand'
     }
 
     return {

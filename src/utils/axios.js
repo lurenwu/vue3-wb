@@ -36,7 +36,7 @@ import axios from 'axios'
 const isTest = location.host.match(/36.7|localhost|21.80/) != null
 //接入服务器接口地址根目录
 //http://localhost:5675/Clientashx
-export const server_base_url =isTest ? 'http://localhost:5675/Clientashx/' : 'http://dutchboychina.cn/weixinApi/Clientashx/';
+export const server_base_url =isTest ? 'http://47.96.90.116:12223/Clientashx/' : 'http://47.96.90.116:12223/Clientashx/';
 
 export default function fetch(options) {
   return new Promise((resolve, reject) => {
@@ -66,12 +66,15 @@ export default function fetch(options) {
         //   router.replace({name: "login"})
         // }
         // Message.warning(msg)
-
-        resolve(data)
+        
+        if(data.data.zt == 0){
+          resolve(data.data)
+        }  else {
+          Toast.fail("接口("+options.url+")异常,请联系管理员");
+        }
       })
       .catch((error) => {
-        Toast.fail('接口异常，请联系管理员')
-
+        Toast.fail("接口("+options.url+")异常,请联系管理员");
         reject(error)
         // console.log(error)
         // //请求失败时,根据业务判断状态

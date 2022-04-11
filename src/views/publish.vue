@@ -12,7 +12,7 @@
                 v-model="info.address"
                 rows="2"
                 autosize
-                label="地址"
+                label="*地址"
                 type="info.address"
                 maxlength="100"
                 placeholder="请填写地址"
@@ -22,13 +22,13 @@
             <van-field
               v-model="info.name"
               name="客户姓名"
-              label="客户姓名"
+              label="*客户姓名"
               placeholder="请填写客户姓名"
             />
             <van-field
               v-model="info.phone"
               name="客户手机号"
-              label="客户手机号"
+              label="*客户手机号"
               placeholder="请输入客户手机号"
             />
             <van-field
@@ -40,27 +40,27 @@
             <van-field name="radio" label="性质">
               <template #input>
                 <van-radio-group v-model="info.nature" direction="horizontal">
-                  <van-radio :name="0">毛坯</van-radio>
-                  <van-radio :name="1">二改房</van-radio>
+                  <van-radio name="0">毛坯</van-radio>
+                  <van-radio name="1">二改房</van-radio>
                 </van-radio-group>
               </template>
             </van-field>
             <van-field
               v-model="info.mianji"
               name="房屋面积"
-              label="房屋面积"
+              label="*房屋面积"
               placeholder="请输入房屋面积"
             />
             <van-field
               v-model="info.style"
               name="装修风格"
-              label="装修风格"
+              label="*装修风格"
               placeholder="请输入装修风格"
             />
             <van-field
               v-model="info.jieduan"
               name="装修阶段"
-              label="装修阶段"
+              label="*装修阶段"
               placeholder="请输入装修阶段"
             />
             <van-field
@@ -84,9 +84,9 @@
             <van-field name="radio" label="装修方案">
               <template #input>
                 <van-radio-group v-model="info.fangan" direction="horizontal">
-                  <van-radio :name="0">全包</van-radio>
-                  <van-radio :name="1">半包</van-radio>
-                  <van-radio :name="2">全案</van-radio>
+                  <van-radio name="0">全包</van-radio>
+                  <van-radio name="1">半包</van-radio>
+                  <van-radio name="2">全案</van-radio>
 
                 </van-radio-group>
               </template>
@@ -94,8 +94,8 @@
             <van-field name="radio" label="可见范围">
               <template #input>
                 <van-radio-group v-model="info.is_all_see" direction="horizontal">
-                  <van-radio :name="1">全部可见</van-radio>
-                  <van-radio :name="0" @click="handleSelectBrand">指定可见</van-radio>
+                  <van-radio name="1">全部可见</van-radio>
+                  <van-radio name="0" @click="handleSelectBrand">指定可见</van-radio>
                 </van-radio-group>
               </template>
             </van-field>
@@ -113,7 +113,7 @@
             </van-cell-group>
           </van-cell-group>
           <div style="margin: 16px">
-            <van-button round block type="primary" @click="onSave">
+            <van-button class="btn" round block type="primary" @click="onSave">
               提交
             </van-button>
           </div>
@@ -121,12 +121,13 @@
       </div>
     </div>
    
-    <van-popup v-model:show="show"  @close="handlePopup" position="bottom" :style="{ height: '80%' }">
+    <van-popup v-model:show="show"  @close="handlePopup" position="bottom" :style="{ height: '600px' }">
       <van-tree-select
+      height="600"
       @click-item="handleTree"
       v-model:active-id="activeIds"
       v-model:main-active-index="activeIndex"
-      :items="seeList"
+      :items="brandList"
     />
     </van-popup>
   </div>
@@ -136,9 +137,10 @@
 import { reactive, onMounted, toRefs, ref } from "vue";
 import { Toast } from "vant";
 import sHeader from "@/components/SimpleHeader";
-import { useRoute } from "vue-router";
-import { get, post } from '@/service/index'
+import { useRoute, useRouter } from "vue-router";
+import { editInfo, addInfo,getTimeList,getInfo } from '@/service/index'
 import {verify} from "@/common/js/verify";
+import { getLocal } from '@/common/js/utils'
 
 export default {
   components: {
@@ -149,32 +151,16 @@ export default {
     const activeIndex = ref(0);
     const items = [];
     const route = useRoute()
+    const router = useRouter()
+
     const state = reactive({
       type: 'add',
       show: false,
       activeIds:[],
-      seeList: [
-        {
-          text: "光大墙纸",
-          des: "gdqz",
-          isShow: false,
-          children: [
-            { text: "当天可见", id: 1, from: "gdqz", isShow: false,day: 1 },
-            { text: "3天后可见", id: 2, from: "gdqz", isShow: false,day: 3 },
-            { text: "7天后可见", id: 3, from: "gdqz", isShow: false,day: 7 },
-          ],
-        },
-        {
-          text: "光大墙纸",
-          des: "sss",
-          isShow: false,
-          children: [
-            { text: "当天可见", id: 4, from: "sss", isShow: false,day: 1 },
-            { text: "3天后可见", id: 5, from: "sss", isShow: false,day: 3 },
-            { text: "7天后可见", id: 6, from: "sss", isShow: false,day: 7 },
-          ],
-        },
-      ],
+     
+      brandList: [],
+      timeList:[],
+      id:"",
       info:{
         address:"",
         nature: 0,
@@ -184,29 +170,80 @@ export default {
         is_all_see: 1
       },
     });
-    const username = ref("");
-    const password = ref("");
+  
 
     onMounted(async () => {
-      const { type } = route.query
+      const { type,id } = route.query
       state.type = type
-      getBranchList();
+      state.id = id || '';
+      state.brand_code = getLocal("brand_code");
+      state.brandList = JSON.parse(getLocal("brandList"));
+
+      if(id) await handleGetInfo();
+       await  handleGetTimeList()
+
+     
     });
+    const handleGetInfo = async () => {
+    
+      const params = {
+        info_id: state.id,
+      };
+      await getInfo(params).then((data)=>{
+        state.info = data.info;
+        
+        
+      })
+    };
+    const handleGetTimeList = async () => {
+      await getTimeList().then((data)=>{
+        state.timeList = data.list;
+      
+        state.brandList.forEach(item=>{
+          item.is_show = false;
+          item.text = item.brand_name;
+          item.children = []
+          state.timeList.forEach(time=>{
+            if(time.from === item.brand_code) {
+              time.is_show = item.is_show === '1';
+              item.children.push(time);
+            }
+          })
+        })
+        if(state.info.is_all_see == 0) {
+          var arrSee = state.info.see_list.split(",");
+          arrSee.forEach(see=>{
+            var brand_code = see.split(" ")[0];
+            var day = see.split(" ")[1];
+            state.brandList.forEach(item=>{
+              item.children.forEach(child=>{
+                if(child.from === brand_code && child.day === day) {
+                  state.activeIds.push(child.id);
+                  child.is_show = true
+                }
+              })
+            })
+           
+          })
+        }
+      });
+     
+    };
     const handlePopup = async() => {
       console.log(2)
-      var chooseSeeList = []
-      state.seeList.forEach(item=>{
+      var choosebrandList = []
+      state.brandList.forEach(item=>{
         item.children.forEach(child=>{
-          if(child.isShow) {
-            chooseSeeList.push(child.from + " " + child.day)
+          if(child.is_show) {
+            choosebrandList.push(child.from + " " + child.day)
           }
         })
       })
-      if(chooseSeeList.length === 0) {
+      if(choosebrandList.length === 0) {
         state.info.is_all_see = 1
       }
-      state.info.see_list = chooseSeeList.toString()
-      console.log(chooseSeeList.toString())
+      state.info.see_list = choosebrandList.toString()
+      console.log(choosebrandList.toString())
     }
     const onSave = async () => {
       console.log(verify)
@@ -216,7 +253,7 @@ export default {
           phone:state.info.phone,
           mianji:state.info.mianji,
           style:state.info.style,
-          jieduan:state.info.jieduan,
+          jieduan:state.info.jieduan
         };
        
       var done = true;
@@ -235,28 +272,20 @@ export default {
       if (!done) {
         return;
       }
-     
-      post((state.type == "add" ? {t:"addInfo",...state.info} : {t: "editInfo",...state.info})).then(()=>{
-        console.log(111)
-      Toast("保存成功");
+      await (state.type == 'add' ? addInfo({brand_code: state.brand_code ,...state.info}) : editInfo({brand_code: state.brand_code ,...state.info})).then(()=>{
+        Toast("保存成功");
+        setTimeout(() => {
+          router.back()
+        }, 1000)
 
       });
+     
 
       // setTimeout(() => {
       //   router.back()
       // }, 1000)
     };
-    const getBranchList = async () => {
-    
-      const params = {
-        t: "getBranchList"
-      };
-      await get(params);
-      Toast("保存成功");
-      // setTimeout(() => {
-      //   router.back()
-      // }, 1000)
-    };
+   
     const handleSelectBrand = async () => {
       state.show = true;
     
@@ -264,20 +293,20 @@ export default {
   
     const handleTree = async (item) => {
       state.activeIds = []
-      state.seeList.forEach((list)=>{
-        if(list.des !== item.from) return;
+      state.brandList.forEach((list)=>{
+        if(list.brand_code !== item.from) return;
         list.children.forEach((see)=>{
           if(item.id === see.id) {
-            list.isShow = !see.isShow;
-            see.isShow = !see.isShow;
+            list.is_show = !see.is_show;
+            see.is_show = !see.is_show;
           } else {
-            see.isShow = false
+            see.is_show = false
           }
         })
       })
-      state.seeList.forEach((list)=>{
+      state.brandList.forEach((list)=>{
         list.children.forEach((see)=>{
-          if(see.isShow) {
+          if(see.is_show) {
             state.activeIds.push(see.id);
           }
         })
@@ -287,14 +316,13 @@ export default {
     return {
       items,
       activeIndex,
-      username,
-      password,
       ...toRefs(state),
-      getBranchList,
       onSave,
       handleSelectBrand,
+      handleGetInfo,
       handleTree,
-      handlePopup
+      handlePopup,
+      handleGetTimeList
     };
   },
 };

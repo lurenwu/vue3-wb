@@ -20,23 +20,23 @@ export const setLocal = (name, value) => {
 
 export const natureList = [
   {
-    value: 0,
+    value: "0",
     name: "毛坯"
   },{
-    value: 1,
+    value: "1",
     name: "二改房"
   },
 ]
 
 export const fanganList = [
   {
-    value: 0,
+    value: "0",
     name: "全包"
   },{
-    value: 1,
+    value: "1",
     name: "半包"
   },{
-    value: 2,
+    value: "2",
     name: "全案"
   }
 ]

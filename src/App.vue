@@ -42,6 +42,7 @@ html, body {
   height: 100%;
   overflow-x: hidden;
   overflow-y: scroll;
+
 }
 #app {
   height: 100%;
@@ -91,5 +92,9 @@ html, body {
 
 .van-badge--fixed {
   z-index: 1000;
+}
+.btn {
+  background: #cc322c !important;
+  border: 1px solid #cc322c !important;
 }
 </style>
