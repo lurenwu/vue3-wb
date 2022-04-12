@@ -20,7 +20,7 @@
       >
         <van-swipe-item v-for="(item, index) in logList" :key="index"
           >{{ item.create_time }} {{item.brand_name}}查看了此信息,{{
-            info.status == "0" ? "未跟进" : info.status == "1" ? "已跟进" : ""
+            item.status == "0" ? "未跟进" : item.status == "1" ? "已跟进" : ""
           }}&nbsp;&nbsp;<span @click="handleGoRouter('logList',{id:item.id,info_id:item.info_id,selfBrandCode:self_brand_code,brandCode:brand_code})">查看</span></van-swipe-item
         >
       </van-swipe>
@@ -118,7 +118,7 @@
               />
             </div>
           </van-cell-group>
-          <div style="margin: 16px;text-align: center;">
+          <div style="margin: 16px;text-align: center;" v-if="self_brand_code !== 'admin'">
             <van-button
               class="info-btn btn"
               round
@@ -243,7 +243,7 @@ export default {
     };
     const handleGetInfo = async () => {
       const params = {
-        info_id: state.id,
+        info_id: state.info_id,
         self_brand_code: state.self_brand_code,
         brand_code: state.brand_code,
       };

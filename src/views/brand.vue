@@ -3,7 +3,7 @@
 <template>
   <div class="seting-box">
     <s-header :name="'品牌列表'" noback  icon-right="icon-a-2_huaban1" @right-callback="handleGoRouter('/publish',{ type: 'add', from:1})"></s-header>
-    <div class="chart-box">
+    <div class="chart-box" v-if="self_brand_code === 'admin'">
       <i class="iconfont icon-a-dakai1x" @click="handleGoRouter('/echart')"></i>
     </div>
     <div class="brand-container" v-for="(item, index) in brandList" :key="index"  @click="handleGoRouter('/infoList',{brand_code:item.brand_code})" >
@@ -26,6 +26,7 @@ import sHeader from '@/components/SimpleHeader'
 import {  getBrandList } from '@/service/index'
 import { setLocal } from '@/common/js/utils'
 import { useRoute, useRouter } from 'vue-router'
+import { getLocal } from "@/common/js/utils";
 
 export default {
   components: {
@@ -36,12 +37,15 @@ export default {
     const router = useRouter()
     const state = reactive({
       from: route.query.from,
+      self_brand_code:"",
       brandList:[
       
       ]
     })
 
     onMounted(async () => {
+      state.self_brand_code = getLocal("brand_code");
+
       handleGetBrandList()
     })
 

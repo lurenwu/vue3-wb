@@ -49,7 +49,17 @@ export function getLogInfo(params) {
     method: 'get',
     params
   })
+  
 }
+
+export function getEchartInfo(params) {
+  return axios({
+    url: '/Auth.ashx?t=getDapanData',
+    method: 'get',
+    params
+  })
+}
+
 
 export function addInfo(data) {
   return axios({
