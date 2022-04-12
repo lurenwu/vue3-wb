@@ -17,7 +17,7 @@
         <van-swipe-item v-for="(item, index) in logList" :key="index"
           >{{ item.create_time }} {{ item.brand_name }}查看了此信息,{{
             info.status == "0" ? "未跟进" : info.status == "1" ? "已跟进" : ""
-          }}&nbsp;&nbsp;<span @click="handleGoRouter('logList',{id:item.id,info_id:item.info_id,selfBrandCode:selfBrandCode,brandCode:brandCode})">查看</span></van-swipe-item
+          }}&nbsp;&nbsp;<span @click="handleGoRouter('logList',{id:item.id,info_id:item.info_id,selfBrandCode:self_brand_code,brandCode:brand_code})">查看</span></van-swipe-item
         >
       </van-swipe>
     </van-notice-bar>
@@ -235,6 +235,8 @@ export default {
     const handleGetInfo = async () => {
       const params = {
         info_id: state.id,
+        self_brand_code: state.self_brand_code,
+        brand_code: state.brand_code,
       };
       await getInfo(params).then((data) => {
         state.info = data.info;

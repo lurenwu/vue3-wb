@@ -13,7 +13,7 @@
         </div>
         <div class="item">
           <div>{{item.brand_name}}</div>
-          <div>发布100 获取200</div>
+          <!-- <div>发布100 获取200</div> -->
         </div>
       </div>
     </div>
@@ -76,7 +76,7 @@ export default {
         width: 335px;
         height: 128px;
         overflow: hidden;
-        background: #ff5722;
+        background: #b0e1ff;
         border-radius: 10px;
         display: flex;
         align-items: center;

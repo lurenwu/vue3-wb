@@ -21,7 +21,7 @@
         <van-swipe-item v-for="(item, index) in logList" :key="index"
           >{{ item.create_time }} {{item.brand_name}}查看了此信息,{{
             info.status == "0" ? "未跟进" : info.status == "1" ? "已跟进" : ""
-          }}&nbsp;&nbsp;<span @click="handleGoRouter('logList',{id:item.id,info_id:item.info_id,selfBrandCode:selfBrandCode,brandCode:brandCode})">查看</span></van-swipe-item
+          }}&nbsp;&nbsp;<span @click="handleGoRouter('logList',{id:item.id,info_id:item.info_id,selfBrandCode:self_brand_code,brandCode:brand_code})">查看</span></van-swipe-item
         >
       </van-swipe>
     </van-notice-bar>
@@ -118,14 +118,22 @@
               />
             </div>
           </van-cell-group>
-          <div style="margin: 16px">
+          <div style="margin: 16px;text-align: center;">
             <van-button
-              class="btn"
+              class="info-btn btn"
               round
-              block
               type="primary"
               v-if="info.status == '' || info.status == '0'"
-              @click="handleFollow(true)"
+              @click="handleFollow(false,true)"
+            > 
+              不跟进
+            </van-button>
+            <van-button
+              class="info-btn btn two-btn"
+              round
+              type="primary"
+              v-if="info.status == '' || info.status == '0'"
+              @click="handleFollow(true,true)"
             >
               跟进
             </van-button>
@@ -181,17 +189,20 @@ export default {
       handleGetLogList();
     });
 
-    const handleFollow = async (result) => {
+    const handleFollow = async (result,isBtn) => {
       if (state.info.status !== "" && !result) {
         router.back();
         return;
       }
-      var tipNum = parseInt(getLocal("tipNum")) + 1;
-      if (tipNum > 3 && !result) {
-        handleUpdateStatus(result);
-        return;
+      if(!isBtn) {
+        var tipNum = parseInt(getLocal("tipNum")) + 1;
+         if (tipNum > 3 && !result ) {
+          handleUpdateStatus(result);
+          return;
+        }
+        setLocal("tipNum", tipNum);
       }
-      setLocal("tipNum", tipNum);
+     
       Dialog.confirm({
         title: "系统提示",
         message: `确定${!result ? "不" : ""}跟进吗`,
@@ -304,5 +315,11 @@ export default {
   line-height: 40px;
   font-size: 12px;
 
+}
+.info-btn {
+  width: 100px;
+  &.two-btn {
+    margin-left: 10px;
+  }
 }
 </style>
