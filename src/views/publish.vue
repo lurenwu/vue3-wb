@@ -209,18 +209,24 @@ export default {
     });
 
     onMounted(async () => {
-      const { type, id,info_id,selfBrandCode } = route.query;
+      const { type, id,info_id,brandCode } = route.query;
       state.type = type;
       state.id = id || "";
-      state.brand_code = getLocal("brand_code");
-      state.self_brand_code = selfBrandCode;
+      state.self_brand_code = getLocal("brand_code");
       state.info_id = info_id;
-
+      state.brand_code = brandCode;
       state.brandList = JSON.parse(getLocal("brandList"));
-
-      if (id) await handleGetInfo();
+      state.brandList.forEach((item,index)=>{
+        if(item.brand_code === state.self_brand_code) {
+          state.brandList.splice(index,1)
+        }
+      })
+      console.log(state.brandList)
+      if (id) {
+        await handleGetInfo();
+        handleGetLogList();
+      }
       await handleGetTimeList();
-      handleGetLogList();
     });
     const handleGetLogList = async () => {
       const params = {
@@ -335,8 +341,8 @@ export default {
       }
 
       await (state.type == "add"
-        ? addInfo({ brand_code: state.brand_code, ...state.info })
-        : editInfo({ brand_code: state.brand_code, ...state.info })
+        ? addInfo({ brand_code: state.self_brand_code, ...state.info })
+        : editInfo({ brand_code: state.self_brand_code, ...state.info })
       ).then(() => {
         Toast("保存成功");
         setTimeout(() => {
