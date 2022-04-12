@@ -347,6 +347,7 @@ export default {
         Toast("保存成功");
         setTimeout(() => {
           router.back();
+          window.location.reload()
         }, 1000);
       });
 
