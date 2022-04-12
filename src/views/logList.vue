@@ -2,9 +2,7 @@
 
 <template>
   <div class="seting-box">
-    <s-header
-      :name="'跟进列表'"
-    ></s-header>
+    <s-header :name="'跟进列表'"></s-header>
     <div>
       <table>
         <tr>
@@ -14,9 +12,11 @@
         </tr>
         <tr v-for="(item, index) in logList" :key="index">
           <td>{{ item.create_time }}</td>
-          <td>{{
-            info.status == "0" ? "未跟进" : info.status == "1" ? "已跟进" : ""
-          }}</td>
+          <td>
+            {{
+              item.status == "0" ? "未跟进" : item.status == "1" ? "已跟进" : ""
+            }}
+          </td>
           <td>{{ item.brand_name }}</td>
         </tr>
       </table>
@@ -28,9 +28,8 @@
 import { reactive, onMounted, toRefs } from "vue";
 import sHeader from "@/components/SimpleHeader";
 
-import { getLogInfo,getInfo } from "@/service/index";
+import { getLogInfo, getInfo } from "@/service/index";
 import { useRoute, useRouter } from "vue-router";
-import { getLocal } from "@/common/js/utils";
 
 export default {
   components: {
@@ -43,28 +42,24 @@ export default {
       from: route.query.from,
       brand_code: "",
       self_brand_code: "",
-      logList:[],
+      logList: [],
       id: "",
-      info_id:"",
-      info: {
-       
-      },
+      info_id: "",
+      info: {},
     });
 
     onMounted(async () => {
-      const { type, id,info_id,selfBrandCode } = route.query;
+      const { type, id, info_id, selfBrandCode, brandCode } = route.query;
       state.type = type;
       state.id = id || "";
-      state.brand_code = getLocal("brand_code");
+      state.brand_code = brandCode;
       state.self_brand_code = selfBrandCode;
       state.info_id = info_id;
-
-      state.brandList = JSON.parse(getLocal("brandList"));
 
       if (id) await handleGetInfo();
       handleGetLogList();
     });
-     const handleGetInfo = async () => {
+    const handleGetInfo = async () => {
       const params = {
         info_id: state.id,
       };
@@ -72,7 +67,7 @@ export default {
         state.info = data.info;
       });
     };
-     const handleGetLogList = async () => {
+    const handleGetLogList = async () => {
       const params = {
         info_id: state.info_id,
         brand_code: state.brand_code,
@@ -90,7 +85,7 @@ export default {
       ...toRefs(state),
       handleGoRouter,
       handleGetLogList,
-      handleGetInfo
+      handleGetInfo,
     };
   },
 };
@@ -120,5 +115,4 @@ table th {
   font-size: 14px;
   letter-spacing: 1px;
 } /* <= 568px */
-
 </style>
