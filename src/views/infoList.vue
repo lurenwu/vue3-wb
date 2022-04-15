@@ -75,6 +75,7 @@ export default {
       var params = {
         status:  state.curTab === 1 ? 1 : state.curTab === 0 ? 0 : '',
         isread: state.curTab === 2 ? 0 : state.curTab === 3 ? 1 : '',
+        self_brand_code: state.self_brand_code
       }
       getInfoList(params).then((data)=>{
         state.infoList = data.list;
