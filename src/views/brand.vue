@@ -2,7 +2,7 @@
 
 <template>
   <div class="seting-box">
-    <s-header :name="'品牌列表'" noback  icon-right="icon-a-2_huaban1" @right-callback="handleGoRouter('/publish',{ type: 'add', from:1})"></s-header>
+    <s-header :name="'品牌列表'" noback center icon-center="icon-weidu2x" icon-right="icon-a-2_huaban1" @center-callback="handleGoRouter('/readList')" @right-callback="handleGoRouter('/publish',{ type: 'add', from:1})"></s-header>
     <div class="chart-box" v-if="self_brand_code === 'admin'">
       <i class="iconfont icon-a-dakai1x" @click="handleGoRouter('/echart')"></i>
     </div>
@@ -13,7 +13,7 @@
         </div>
         <div class="item">
           <div>{{item.brand_name}}</div>
-          <!-- <div>发布100 获取200</div> -->
+          <div>发布{{item.fabuSum}}个</div>
         </div>
       </div>
     </div>
@@ -27,6 +27,7 @@ import {  getBrandList } from '@/service/index'
 import { setLocal } from '@/common/js/utils'
 import { useRoute, useRouter } from 'vue-router'
 import { getLocal } from "@/common/js/utils";
+import { getEchartInfo } from "@/service/index";
 
 export default {
   components: {
@@ -38,23 +39,33 @@ export default {
     const state = reactive({
       from: route.query.from,
       self_brand_code:"",
-      brandList:[
-      
-      ]
+      brandList:[],
+      echartInfo:{}
     })
 
     onMounted(async () => {
       state.self_brand_code = getLocal("brand_code");
-
-      handleGetBrandList()
+      await handleGetBrandList()
     })
-
+ const handleGetEchartInfo = async () => {
+      await getEchartInfo().then((data) => {
+        state.brandList.forEach((brand) => {
+          data.list.forEach((element) => {
+            if (element.brand_code === brand.brand_code) {
+              brand["fabuSum"] = element.brandfabuSum
+            }
+          });
+        });
+      });
+    };
     
 
     const handleGetBrandList = async () => {
       getBrandList().then((data)=>{
         state.brandList = data.list;
         setLocal("brandList",JSON.stringify(state.brandList))
+        handleGetEchartInfo();
+
       });
      
     };
@@ -65,7 +76,8 @@ export default {
     return {
       ...toRefs(state),
       handleGetBrandList,
-      handleGoRouter
+      handleGoRouter,
+      handleGetEchartInfo
     }
   }
 }

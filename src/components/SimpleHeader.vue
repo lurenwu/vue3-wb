@@ -3,6 +3,7 @@
 <template>
   <header class="simple-header van-hairline--bottom">
     <i v-if="!isback" class="nbicon nbfanhui" @click="goBack"></i>
+    <i v-else-if="iscenter">  <i class="iconfont" :class="iconCenter ? iconCenter : ''" @click="handleCenter"></i></i>
     <i v-else></i>
     <div class="simple-header-name">{{ name }}</div>
     <i class="iconfont" :class="iconRight ? iconRight : ''" @click="handleRight"></i>
@@ -20,6 +21,10 @@ export default {
       type: String,
       default: ''
     },
+    iconCenter: {
+      type: String,
+      default: ''
+    },
     name: {
       type: String,
       default: ''
@@ -32,14 +37,20 @@ export default {
       type: Boolean,
       default: false
     },
+    center: {
+      type: Boolean,
+      default: false
+    },
     isComfirmBack: {
       type: Boolean,
       default: false
     }
   },
-  emits: ['callback','right-callback'],
+  emits: ['callback','right-callback','center-callback'],
   setup(props, ctx) {
     const isback = ref(props.noback)
+    const iscenter = ref(props.center)
+
     const router = useRouter()
     const goBack = () => {
       if(props.isComfirmBack) {
@@ -59,10 +70,17 @@ export default {
       console.log(1)
       ctx.emit('right-callback')
     }
+    const handleCenter = () => {
+      console.log(1)
+      ctx.emit('center-callback')
+    }
+    
     return {
       handleRight,
+      handleCenter,
       goBack,
-      isback
+      isback,
+      iscenter
     }
   }
 }

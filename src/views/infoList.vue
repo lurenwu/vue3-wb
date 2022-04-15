@@ -4,7 +4,7 @@
   <div class="seting-box">
     <s-header :name="'信息列表'"   icon-right="icon-sousuo_o" @right-callback="handleGoRouter('search',{brand_code:brand_code})"></s-header>
     <div class="brand-container">
-      <div class="tab" v-if="self_brand_code !== brand_code || self_brand_code === ''">
+      <div class="tab" v-if="self_brand_code !== brand_code && self_brand_code !== 'admin'">
         <div class="tab-item" :class="{'active':curTab === item.value}" v-for="(item, index) in tabList" :key="index"  @click="toggleTab(item.value)">{{item.title}}</div>
       </div>
       <info-item :infoList="infoList" :selfBrandCode="self_brand_code" :brandCode="brand_code" @callback="handleGetInfoList"></info-item>
@@ -75,8 +75,6 @@ export default {
       var params = {
         status:  state.curTab === 1 ? 1 : state.curTab === 0 ? 0 : '',
         isread: state.curTab === 2 ? 0 : state.curTab === 3 ? 1 : '',
-        brand_code: state.brand_code,
-        self_brand_code: state.self_brand_code
       }
       getInfoList(params).then((data)=>{
         state.infoList = data.list;

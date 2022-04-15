@@ -25,15 +25,15 @@
           <div>{{item.brand_name}}</div>
           <div class="echart-total-item">
             <div class="item">
-              <div class="title">各品牌发布信息总数</div>
+              <div class="title">各品牌发布总数</div>
               <div class="value">{{item.fabuSum}}</div>
             </div>
             <div class="item">
-              <div class="title">各品牌获取信息总数</div>
+              <div class="title">各品牌获取总数</div>
               <div class="value">{{item.brandgenjinSum}}</div>
             </div>
              <div class="item">
-              <div class="title">各品牌获取信息有效数</div>
+              <div class="title">各品牌被获取有效数</div>
               <div class="value">{{item.brandbeigenjinSum}}</div>
             </div>
           </div>

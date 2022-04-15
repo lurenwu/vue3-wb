@@ -77,6 +77,14 @@ const router = createRouter({
       }
     },
     {
+      path: '/readList',
+      name: 'readList',
+      component: () => import(/* webpackChunkName: "readList" */ '@/views/readList.vue'),
+      meta: {
+        index: 1
+      }
+    },
+    {
       path: '/home',
       name: 'home',
       component: () => import(/* webpackChunkName: "home" */ '@/views/Home.vue'),

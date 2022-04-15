@@ -38,7 +38,7 @@
 <script>
 import { reactive, toRefs } from 'vue'
 import sHeader from '@/components/SimpleHeader'
-import { login } from '@/service/index'
+import { login,getBrandList } from '@/service/index'
 import { setLocal } from '@/common/js/utils'
 import { Toast } from 'vant'
 
@@ -49,9 +49,20 @@ export default {
       username: '',
       password: '',
       type: 'login',
+      brandList:[]
     })
 
-    
+    const handleGetBrandList = async () => {
+      getBrandList().then((data)=>{
+        state.brandList = data.list;
+        setLocal("brandList",JSON.stringify(state.brandList))
+        window.location.href = '/#/infoList'
+        // window.location.href = '/#/brand'
+      
+
+      });
+     
+    };
 
     // 提交登录或注册表单
     const onSubmit = async (values) => {
@@ -64,9 +75,9 @@ export default {
         if(data.list.length === 0) {
           Toast.fail('用户名或者密码错误，请检查~')
         } else {
-          window.location.href = '/#/brand'
           setLocal('userInfo', JSON.stringify(data.list[0]))
           setLocal('brand_code', data.list[0].brand_code)
+          handleGetBrandList()
         }
       });
      
@@ -77,7 +88,8 @@ export default {
     return {
     
       ...toRefs(state),
-      onSubmit
+      onSubmit,
+      handleGetBrandList
     }
   },
   components: {

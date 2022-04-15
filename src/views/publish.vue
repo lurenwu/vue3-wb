@@ -73,12 +73,16 @@
               label="*装修风格"
               placeholder="请输入装修风格"
             />
-            <van-field
-              v-model="info.jieduan"
-              name="装修阶段"
-              label="*装修阶段"
-              placeholder="请输入装修阶段"
-            />
+             <van-field name="radio" label="装修阶段">
+              <template #input>
+                <van-radio-group v-model="info.jieduan" direction="horizontal">
+                  <van-radio name="0">刚开工</van-radio>
+                  <van-radio name="1">水电</van-radio>
+                  <van-radio name="2">木工</van-radio>
+                  <van-radio name="2">油漆</van-radio>
+                </van-radio-group>
+              </template>
+            </van-field>
             <van-field
               v-model="info.yusuan"
               name="装修预算"
@@ -116,6 +120,9 @@
                   <van-radio name="0" @click="handleSelectBrand"
                     >指定可见</van-radio
                   >
+                   <van-radio name="2" 
+                    >取消可见</van-radio
+                  >
                 </van-radio-group>
               </template>
             </van-field>
@@ -152,7 +159,7 @@
         @click-item="handleTree"
         v-model:active-id="activeIds"
         v-model:main-active-index="activeIndex"
-        :items="brandList"
+        :items="parentTimeList"
       />
     </van-popup>
   </div>
@@ -192,7 +199,11 @@ export default {
       brandList: [],
       brand_code:"",
       self_brand_code:"",
-      timeList: [],
+      parentTimeList: [
+        {text:"当天可见",id:1,day:1},
+        {text:"3天可见",id:2,day:3},
+        {text:"7天可见",id:3,day:7},
+      ],
       id: "",
       info_id:"",
       info: {
@@ -204,7 +215,7 @@ export default {
         is_all_see: "1",
         mianji: "",
         style: "",
-        jieduan: "",
+        jieduan: "0",
       },
     });
 
@@ -251,13 +262,16 @@ export default {
     const handleGetTimeList = async () => {
       await getTimeList().then((data) => {
         state.timeList = data.list;
-
-        state.brandList.forEach((item) => {
+        state.timeList.forEach((item,index)=>{
+          if(item.from === state.self_brand_code) {
+            state.timeList.splice(index,1)
+          }
+        })
+        state.parentTimeList.forEach((item) => {
           item.is_show = false;
-          item.text = item.brand_name;
           item.children = [];
           state.timeList.forEach((time) => {
-            if (time.from === item.brand_code ) {
+            if ( parseInt(time.day) ===item.day ) {
               time.is_show = item.is_show === "1";
               item.children.push(time);
             }
@@ -268,9 +282,9 @@ export default {
           arrSee.forEach((see) => {
             var brand_code = see.split(" ")[0];
             var day = see.split(" ")[1];
-            state.brandList.forEach((item) => {
+            state.parentTimeList.forEach((item) => {
               item.children.forEach((child) => {
-                if (child.from === brand_code && child.day === day) {
+                if (child.from === brand_code && child.day == day) {
                   state.activeIds.push(child.id);
                   child.is_show = true;
                 }
@@ -278,12 +292,15 @@ export default {
             });
           });
         }
+      
       });
+     
+       
     };
     const handlePopup = async () => {
       console.log(2);
       var choosebrandList = [];
-      state.brandList.forEach((item) => {
+      state.parentTimeList.forEach((item) => {
         item.children.forEach((child) => {
           if (child.is_show) {
             choosebrandList.push(child.from + " " + child.day);
@@ -323,22 +340,22 @@ export default {
       if (!done) {
         return;
       }
-      if (
-        !/^(0|86|17951)?(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$/.test(
-          state.info.phone
-        )
-      ) {
-        return Toast.fail("请输入正确的手机号");
-      }
-      if (state.info.phone2) {
-        if (
-          !/^(0|86|17951)?(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$/.test(
-            state.info.phone2
-          )
-        ) {
-          return Toast.fail("请输入正确的手机号");
-        }
-      }
+      // if (
+      //   !/^(0|86|17951)?(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$/.test(
+      //     state.info.phone
+      //   )
+      // ) {
+      //   return Toast.fail("请输入正确的手机号");
+      // }
+      // if (state.info.phone2) {
+      //   if (
+      //     !/^(0|86|17951)?(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$/.test(
+      //       state.info.phone2
+      //     )
+      //   ) {
+      //     return Toast.fail("请输入正确的手机号");
+      //   }
+      // }
 
       await (state.type == "add"
         ? addInfo({ brand_code: state.self_brand_code, ...state.info })
@@ -346,11 +363,12 @@ export default {
       ).then(() => {
         Toast("保存成功");
         setTimeout(() => {
-          router.back();
-          window.location.reload()
+          router.replace({name: "brand"})
+          // 数据返回有问题
+          // router.replace({name: "infoList",query: { brand_code: state.self_brand_code }})
         }, 1000);
       });
-
+      // 数据返回有问题
       // setTimeout(() => {
       //   router.back()
       // }, 1000)
@@ -364,18 +382,18 @@ export default {
     }
     const handleTree = async (item) => {
       state.activeIds = [];
-      state.brandList.forEach((list) => {
-        if (list.brand_code !== item.from) return;
+      state.parentTimeList.forEach((list) => {
+        if (list.day != item.day) return;
         list.children.forEach((see) => {
           if (item.id === see.id) {
             list.is_show = !see.is_show;
             see.is_show = !see.is_show;
           } else {
-            see.is_show = false;
+            // see.is_show = false;
           }
         });
       });
-      state.brandList.forEach((list) => {
+      state.parentTimeList.forEach((list) => {
         list.children.forEach((see) => {
           if (see.is_show) {
             state.activeIds.push(see.id);
@@ -412,6 +430,10 @@ export default {
   .van-address-edit {
     .van-cell {
       font-size: 12px;
+      padding: 10px 5px;
+    }
+    .van-radio--horizontal {
+      margin-right: 8px;
     }
     .van-button--danger {
       background: @primary;
