@@ -24,7 +24,7 @@
 <script>
 import { reactive, onMounted, toRefs } from 'vue'
 import sHeader from '@/components/SimpleHeader'
-import { getInfoList,getSelfInfoList } from '@/service/index'
+import { getInfoList } from '@/service/index'
 import { useRoute, useRouter } from 'vue-router'
 import { getLocal } from '@/common/js/utils'
 import infoItem from '@/components/infoItem'
