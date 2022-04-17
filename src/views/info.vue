@@ -44,7 +44,7 @@
               readonly
               label="性质"
             />
-            <div v-if="info.status == '1'">
+            <div v-if="info.status == '1' || info.status == '3'">
               <van-field
                 v-model="info.name"
                 name="客户姓名"

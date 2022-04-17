@@ -24,7 +24,7 @@
     <div class="van-address-edit">
       <div class="">
         <van-form>
-          <van-cell-group inset>
+          <van-cell-group  >
             <van-field
               v-model="info.address"
               rows="2"

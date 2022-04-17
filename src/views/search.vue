@@ -54,20 +54,19 @@ export default {
     const handleGetInfoList = async () => {
       var params = {
         search: state.search,
-        brand_code: state.brand_code,
         self_brand_code: state.self_brand_code
       }
-      if(state.self_brand_code !== state.brand_code) {
         getInfoList(params).then((data)=>{
           state.isShow = true;
           state.infoList = data.list;
+          state.brandList.forEach(item=>{
+            state.infoList.forEach(info=>{
+              if(item.brand_code === info.brand_code) {
+                info.brand_name=item.brand_name
+              }
+            })
+          })
         });
-      } else {
-        getSelfInfoList(params).then((data)=>{
-          state.isShow = true;
-          state.infoList = data.list;
-        });
-      }
     };
     const handleGoRouter = async (path,query) => {
       router.push({ path: path, query: query})

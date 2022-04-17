@@ -42,6 +42,7 @@ export default {
       curTab: '',
       curDone: '1',
       infoList:[],
+      brandList: [],
       doneList: [
         {
           title: '我发布的成交',
@@ -83,6 +84,7 @@ export default {
     onMounted(async () => {
       // const { brand_code } = route.query;
       state.self_brand_code = getLocal("brand_code");
+      state.brandList = JSON.parse(getLocal("brandList"));
       handleGetInfoList();
     })
     const toggleTab = (tab)=>{
@@ -104,6 +106,13 @@ export default {
       }
       getInfoList(params).then((data)=>{
         state.infoList = data.list;
+        state.brandList.forEach(item=>{
+          state.infoList.forEach(info=>{
+            if(item.brand_code === info.brand_code) {
+              info.brand_name=item.brand_name
+            }
+          })
+        })
       });
       // if(state.self_brand_code !== state.brand_code) {
       

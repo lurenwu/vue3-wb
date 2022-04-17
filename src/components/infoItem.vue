@@ -10,7 +10,7 @@
             <div v-if="selfBrandCode !== item.brand_code">{{item.status == '0' ? '未跟进' : item.status == '1' ? '跟进中' :  item.status == '2' ? '已放弃':  item.status == '3' ? '已成交': ''}}</div>
           </div>
           <div class="item"  v-if="selfBrandCode !== item.brand_code">
-            <div></div>
+            <div>所属品牌:{{item.brand_name}}</div>
             <div>{{item.isread == '0' ? '未读' : '已读'}}</div>
           </div>
           <div class="item">

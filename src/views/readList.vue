@@ -29,6 +29,7 @@ export default {
     const state = reactive({
       search: "",
       brand_code:"",
+      brandList:[],
       self_brand_code:"",
       infoList:[],
       isShow: false
@@ -36,6 +37,8 @@ export default {
 
     onMounted(async () => {
       state.self_brand_code = getLocal("brand_code");
+      state.brandList = JSON.parse(getLocal("brandList"));
+
       handleGetInfoList();
     })
     const handleGetInfoList = async () => {
@@ -46,6 +49,13 @@ export default {
       }
       getInfoList(params).then((data)=>{
         state.infoList = data.list;
+        state.brandList.forEach(item=>{
+          state.infoList.forEach(info=>{
+            if(item.brand_code === info.brand_code) {
+              info.brand_name=item.brand_name
+            }
+          })
+        })
       });
     };
     const handleGoRouter = async (path,query) => {
