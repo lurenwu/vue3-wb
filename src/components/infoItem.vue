@@ -3,13 +3,13 @@
 <template> 
   <div>
     <div></div>
-    <div class="info-box" v-for="(item, index) in infoList" :key="index" @click="handleGoRouter((selfBrandCode !== brandCode ? 'info':'publish'),{id:item.id,info_id:item.info_id,selfBrandCode:selfBrandCode,brandCode:brandCode})">
+    <div class="info-box" v-for="(item, index) in infoList" :key="index" @click="handleGoRouter((selfBrandCode !== item.brand_code ? 'info':'publish'),{id:item.id,info_id:item.info_id,selfBrandCode:selfBrandCode,brandCode:item.brand_code})">
         <div class="info-item">
            <div class="item">
             <div class="title">{{item.address}}</div>
-            <div v-if="selfBrandCode !== brandCode">{{item.status == '0' ? '未跟进' : item.status == '1' ? '跟进中' : ''}}</div>
+            <div v-if="selfBrandCode !== item.brand_code">{{item.status == '0' ? '未跟进' : item.status == '1' ? '跟进中' :  item.status == '2' ? '已放弃':  item.status == '3' ? '已成交': ''}}</div>
           </div>
-          <div class="item"  v-if="selfBrandCode !== brandCode">
+          <div class="item"  v-if="selfBrandCode !== item.brand_code">
             <div></div>
             <div>{{item.isread == '0' ? '未读' : '已读'}}</div>
           </div>
@@ -35,11 +35,7 @@ export default {
     selfBrandCode: {
       type: String,
       default: ''
-    },
-    brandCode: {
-      type: String,
-      default: ''
-    },
+    }
   },
   emits: ['callback'],
   setup(props) {

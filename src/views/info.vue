@@ -5,7 +5,7 @@
     <s-header
       name="查看信息"
       isComfirmBack
-      @callback="handleFollow(false)"
+      @callback="handleFollow(false,false,'0')"
     ></s-header>
     <van-notice-bar
       left-icon="volume-o"
@@ -20,7 +20,7 @@
       >
         <van-swipe-item v-for="(item, index) in logList" :key="index"
           >{{ item.create_time }} {{item.brand_name}}查看了此信息,{{
-            item.status == "0" ? "未跟进" : item.status == "1" ? "已跟进" : ""
+            item.status == "0" ? "未跟进" : item.status == "1" ? "已跟进" : item.status == "2" ? "已放弃" : item.status == "3" ? "已成交" : ""
           }}&nbsp;&nbsp;<span @click="handleGoRouter('logList',{id:item.id,info_id:item.info_id,selfBrandCode:self_brand_code,brandCode:brand_code})">查看</span></van-swipe-item
         >
       </van-swipe>
@@ -118,13 +118,12 @@
               />
             </div>
           </van-cell-group>
-          <div style="margin: 16px;text-align: center;" v-if="self_brand_code !== 'admin'">
+          <div style="margin: 16px;text-align: center;" v-if="self_brand_code !== 'admin' && (info.status == '' || info.status == '0')">
             <van-button
               class="info-btn btn"
               round
               type="primary"
-              v-if="info.status == '' || info.status == '0'"
-              @click="handleFollow(false,true)"
+              @click="handleFollow(false,true,'0')"
             > 
               不跟进
             </van-button>
@@ -132,10 +131,27 @@
               class="info-btn btn two-btn"
               round
               type="primary"
-              v-if="info.status == '' || info.status == '0'"
-              @click="handleFollow(true,true)"
+              @click="handleFollow(true,true,'1')"
             >
               跟进
+            </van-button>
+          </div>
+          <div style="margin: 16px;text-align: center;" v-if="self_brand_code !== 'admin' && info.status == '1'">
+            <van-button
+              class="info-btn btn"
+              round
+              type="primary"
+              @click="handleDeal('2')"
+            > 
+              放弃
+            </van-button>
+            <van-button
+              class="info-btn btn two-btn"
+              round
+              type="primary"
+              @click="handleDeal('3')"
+            >
+              成交
             </van-button>
           </div>
         </van-form>
@@ -188,8 +204,18 @@ export default {
       handleGetInfo();
       handleGetLogList();
     });
-
-    const handleFollow = async (result,isBtn) => {
+    const handleDeal = async (status) => {
+      Dialog.confirm({
+        title: "系统提示",
+        message: `确定${status == '3' ? "成交" : "放弃"}该信息吗`,
+      })
+        .then(async () => {
+          handleUpdateStatus(status);
+        })
+        .catch(() => {});
+    };
+   
+    const handleFollow = async (result,isBtn,status) => {
       if (state.info.status !== "" && !result) {
         router.back();
         return;
@@ -197,7 +223,7 @@ export default {
       if(!isBtn) {
         var tipNum = parseInt(getLocal("tipNum")) + 1;
          if (tipNum > 3 && !result ) {
-          handleUpdateStatus(result);
+          handleUpdateStatus(status);
           return;
         }
         setLocal("tipNum", tipNum);
@@ -208,22 +234,22 @@ export default {
         message: `确定${!result ? "不" : ""}跟进吗`,
       })
         .then(async () => {
-          handleUpdateStatus(result);
+          handleUpdateStatus(status);
         })
         .catch(() => {});
     };
-    const handleUpdateStatus = async (result) => {
+    const handleUpdateStatus = async (status) => {
       const params = {
         id: state.id,
         info_id: state.info_id,
-        status: result ? 1 : 0,
+        status: status,
         brand_code: state.brand_code,
         self_brand_code: state.self_brand_code,
         curStatus: state.info.status,
       };
       await updateKehuInfoStatus(params).then(() => {
-        if (result) {
-          Toast("跟进成功");
+        if (['1','2','3'].indexOf(status) > -1) {
+          Toast('操作成功');
           setTimeout(function(){
             window.location.reload();
           },1000)
@@ -278,6 +304,7 @@ export default {
       ...toRefs(state),
       handleGetInfo,
       handleFollow,
+      handleDeal,
       handleRead,
       handleUpdateStatus,
       handleGetLogList,

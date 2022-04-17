@@ -16,7 +16,7 @@
       >
         <van-swipe-item v-for="(item, index) in logList" :key="index"
           >{{ item.create_time }} {{ item.brand_name }}查看了此信息,{{
-            item.status == "0" ? "未跟进" : item.status == "1" ? "已跟进" : ""
+            item.status == "0" ? "未跟进" : item.status == "1" ? "已跟进" : item.status == "2" ? "已放弃" : item.status == "3" ? "已成交" : ""
           }}&nbsp;&nbsp;<span @click="handleGoRouter('logList',{id:item.id,info_id:item.info_id,selfBrandCode:self_brand_code,brandCode:brand_code})">查看</span></van-swipe-item
         >
       </van-swipe>
@@ -154,6 +154,7 @@
       position="bottom"
       :style="{ height: '600px' }"
     >
+      <div class="popup-comfirm" @click="handlePopup">确定</div>
       <van-tree-select
         height="600"
         @click-item="handleTree"
@@ -298,7 +299,7 @@ export default {
        
     };
     const handlePopup = async () => {
-      console.log(2);
+      state.show = false;
       var choosebrandList = [];
       state.parentTimeList.forEach((item) => {
         item.children.forEach((child) => {
@@ -363,9 +364,9 @@ export default {
       ).then(() => {
         Toast("保存成功");
         setTimeout(() => {
-          router.replace({name: "brand"})
+          // router.replace({name: "brand"})
           // 数据返回有问题
-          // router.replace({name: "infoList",query: { brand_code: state.self_brand_code }})
+          router.replace({name: "infoList"})
         }, 1000);
       });
       // 数据返回有问题
@@ -448,5 +449,11 @@ export default {
   height: 40px;
   line-height: 40px;
   font-size: 12px;
+}
+.popup-comfirm {
+    text-align: right;
+    padding: 10px 20px;
+    font-size: 14px;
+    color: #ee0a24;
 }
 </style>
