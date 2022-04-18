@@ -47,7 +47,7 @@ export default {
       state.self_brand_code = getLocal("brand_code");
       await handleGetBrandList()
     })
- const handleGetEchartInfo = async () => {
+    const handleGetEchartInfo = async () => {
       await getEchartInfo().then((data) => {
         state.brandList.forEach((brand) => {
           data.list.forEach((element) => {
