@@ -2,7 +2,7 @@
 
 <template>
   <div class="seting-box">
-    <s-header :name="'信息列表'"   icon-right="icon-sousuo_o" @right-callback="handleGoRouter('search')"></s-header>
+    <s-header :name="'信息列表'"  noback center icon-center="icon-sousuo_o" icon-right="icon-a-2_huaban1"  @center-callback="handleGoRouter('search')" @right-callback="handleGoRouter('/publish',{ type: 'add', from:1})"></s-header>
     <div class="brand-container">
       <div class="tab" >
         <div class="tab-item" :class="{'active':curTab === item.value}" v-for="(item, index) in tabList" :key="index"  @click="toggleTab(item.value)">{{item.title}}</div>
@@ -11,9 +11,7 @@
         <div class="tab-child-item" :class="{'active':curDone === item.value}" v-for="(item, index) in doneList" :key="index"  @click="toggleTabChild(item.value)">{{item.title}}</div>
       </div>
       <info-item :infoList="infoList" :selfBrandCode="self_brand_code"  @callback="handleGetInfoList"></info-item>
-   
     </div>
-  
   </div>
 </template>
 
