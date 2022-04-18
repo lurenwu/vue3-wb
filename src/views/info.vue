@@ -31,12 +31,9 @@
           <van-cell-group inset>
             <van-field
               v-model="info.address"
-              rows="2"
-              autosize
+              name="客户地址"
               readonly
-              label="地址"
-              type="textarea"
-              maxlength="100"
+              label="客户地址"
             />
             <van-field
               v-model="info.natureDes"
@@ -187,11 +184,13 @@ export default {
       fanganList: fanganList,
       info: {},
       logList: [],
+      userInfo:{},
       type: "",
       brand_code:"",
       self_brand_code:"",
       id: "",
-      info_id:""
+      info_id:"",
+      tip: ""
     });
 
     onMounted(async () => {
@@ -201,13 +200,27 @@ export default {
       state.self_brand_code = selfBrandCode;
       state.brand_code = brandCode;
       state.info_id = info_id;
+      state.userInfo = JSON.parse(getLocal("userInfo"));
+
       handleGetInfo();
       handleGetLogList();
     });
+    const checkInfo = async () =>{
+      var read_num = parseInt(state.userInfo.read_num);
+      if(read_num === 0) {
+        state.tip = '你的可读权限不足，请尽快发布信息。';
+        Toast.fail(state.tip);
+        return
+      }
+      if(read_num < 10) {
+        state.tip = '你的可读权限不足10条，请尽快发布信息。';
+      }
+    }
     const handleDeal = async (status) => {
+      checkInfo();
       Dialog.confirm({
-        title: "系统提示",
-        message: `确定${status == '3' ? "成交" : "放弃"}该信息吗`,
+        title: "温馨提示",
+        message: `${state.tip}确定${status == '3' ? "成交" : "放弃"}该信息吗`,
       })
         .then(async () => {
           handleUpdateStatus(status);
@@ -228,10 +241,10 @@ export default {
         }
         setLocal("tipNum", tipNum);
       }
-     
+      checkInfo();
       Dialog.confirm({
-        title: "系统提示",
-        message: `确定${!result ? "不" : ""}跟进吗`,
+        title: "温馨提示",
+        message: `${state.tip}确定${!result ? "不" : ""}跟进吗`,
       })
         .then(async () => {
           handleUpdateStatus(status);
@@ -308,7 +321,8 @@ export default {
       handleRead,
       handleUpdateStatus,
       handleGetLogList,
-      handleGoRouter
+      handleGoRouter,
+      checkInfo
     };
   },
 };

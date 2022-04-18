@@ -7,19 +7,22 @@
       </div>
       <div class="echart-total-item">
         <div class="item">
-          <div class="title">累积发布信息总数</div>
-          <div class="value">
-            {{ echartInfo && echartInfo.info && echartInfo.info.fabuSum }}
-          </div>
+          <div class="title">累积发布信息总数：{{ echartInfo && echartInfo.info && echartInfo.info.fabuSum }}</div>
         </div>
         <div class="item">
-          <div class="title">累积跟进信息总数</div>
-          <div class="value">
-            {{ echartInfo && echartInfo.info && echartInfo.info.genjinSum }}
-          </div>
+          <div class="title">累积跟进信息总数： {{ echartInfo && echartInfo.info && echartInfo.info.genjinSum }}</div>
+        </div>
+        <div class="item">
+          <div class="title">累积获取信息总数：{{ echartInfo && echartInfo.info && echartInfo.info.genjinSum }}</div>
+        </div>
+        <div class="item">
+          <div class="title">成交数量：{{ echartInfo && echartInfo.info && echartInfo.info.genjinSum }}</div>
+        </div>
+        <div class="item">
+          <div class="title">被成交数量：{{ echartInfo && echartInfo.info && echartInfo.info.genjinSum }}</div>
         </div>
       </div>
-      <div class="brand-tongji">
+      <!-- <div class="brand-tongji">
         <span>各品牌信息统计</span>
         <div class="echart-box" v-for="(item, index) in echartInfo.newList" :key="index">
           <div>{{item.brand_name}}</div>
@@ -39,7 +42,7 @@
           </div>
         </div>
      
-      </div>
+      </div> -->
     </div>
     <!-- 模拟接口数据更改 -->
     <!-- <button @click="changeChartData">点击更改传值</button> -->
@@ -121,12 +124,12 @@ export default {
   padding: 20px;
   font-size: 14px;
   border-bottom: 1px solid #babcc5;
-  display: flex;
+  // display: flex;
   font-weight: 500;
 
   .item {
-    flex: 1;
-    text-align: center;
+    // flex: 1;
+    // text-align: center;
   }
   .title {
     font-size: 16px;

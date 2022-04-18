@@ -39,7 +39,7 @@ export default {
       from: route.query.from,
       brand_code:"",
       self_brand_code:"",
-      curTab: '',
+      curTab: '0',
       curDone: '1',
       infoList:[],
       brandList: [],
@@ -55,8 +55,8 @@ export default {
       ],
       tabList:[
         {
-          title: '未跟进',
-          value: '0'
+          title: '我发布',
+          value: ''
         },
         {
           title: '跟进中',
@@ -67,7 +67,7 @@ export default {
           value: '3'
         },
         {
-          title: '已放弃',
+          title: '已放弃(未跟进)',
           value: '2'
         },
         {
@@ -85,6 +85,7 @@ export default {
       // const { brand_code } = route.query;
       state.self_brand_code = getLocal("brand_code");
       state.brandList = JSON.parse(getLocal("brandList"));
+
       handleGetInfoList();
     })
     const toggleTab = (tab)=>{
