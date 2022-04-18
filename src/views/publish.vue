@@ -171,13 +171,30 @@
       :style="{ height: '600px' }"
     >
       <div class="popup-comfirm" @click="handlePopup">确定</div>
-      <van-tree-select
+      <div class="van-tree-select" style="height: 600px">
+        <div class="van-sidebar van-tree-select__nav">
+          <a
+            class="
+              van-sidebar-item 
+              van-tree-select__nav-item"
+              @click="curTime = item.day"
+              :class="{'van-sidebar-item--select': curTime == item.day }" v-for="(item, index) in parentTimeList" :key="index"
+            ><div class="van-badge__wrapper van-sidebar-item__text"  >
+              {{item.text}}
+            </div></a
+          >
+        </div>
+        <div class="van-tree-select__content">
+          <div class="van-ellipsis van-tree-select__item" :class="{'van-tree-select__item--active': curBrandList.indexOf(item.brand_code) > -1 }" v-for="(item, index) in brandList" :key="index" @click="handleTreeChoose(item.brand_code)">{{item.brand_name}}</div>
+        </div>
+      </div>
+      <!-- <van-tree-select
         height="600"
         @click-item="handleTree"
         v-model:active-id="activeIds"
         v-model:main-active-index="activeIndex"
         :items="parentTimeList"
-      />
+      /> -->
     </van-popup>
   </div>
 </template>
@@ -189,13 +206,7 @@ import sHeader from "@/components/SimpleHeader";
 import { useRoute, useRouter } from "vue-router";
 import { Dialog } from "vant";
 
-import {
-  editInfo,
-  addInfo,
-  getTimeList,
-  getInfo,
-  getLogInfo,
-} from "@/service/index";
+import { editInfo, addInfo, getInfo, getLogInfo } from "@/service/index";
 import { verify } from "@/common/js/verify";
 import { getLocal } from "@/common/js/utils";
 
@@ -217,14 +228,16 @@ export default {
       logList: [],
       brand_code: "",
       self_brand_code: "",
+      curBrandList:[],
+      curTime:1,
       parentTimeList: [
         { text: "当天可见", id: 1, day: 1 },
         { text: "3天可见", id: 2, day: 3 },
         { text: "7天可见", id: 3, day: 7 },
       ],
+      brandList: [],
       id: "",
       info_id: "",
-      timeList: [],
       info: {
         address: "",
         nature: "0",
@@ -245,6 +258,7 @@ export default {
       state.self_brand_code = getLocal("brand_code");
       state.info_id = info_id;
       state.brand_code = brandCode;
+      state.brandList = JSON.parse(getLocal("brandList"));
 
       if (id) {
         await handleGetInfo();
@@ -273,47 +287,21 @@ export default {
       });
     };
     const handleGetTimeList = async () => {
-      await getTimeList().then((data) => {
-        state.timeList = data.list;
-        state.timeList = state.timeList.filter(
-          (item) => item.from !== state.self_brand_code
-        );
-        state.parentTimeList.forEach((item) => {
-          item.is_show = false;
-          item.children = [];
-          state.timeList.forEach((time) => {
-            if (parseInt(time.day) === item.day) {
-              time.is_show = item.is_show === "1";
-              item.children.push(time);
-            }
-          });
+      if (state.info.is_all_see == 0) {
+        var arrSee = state.info.see_list.split(",");
+        arrSee.forEach((see) => {
+          var brand_code = see.split(" ")[0];
+          state.curBrandList.push(brand_code);
+          state.curTime =  see.split(" ")[1];
+          console.log(state.curTime)
         });
-        if (state.info.is_all_see == 0) {
-          var arrSee = state.info.see_list.split(",");
-          arrSee.forEach((see) => {
-            var brand_code = see.split(" ")[0];
-            var day = see.split(" ")[1];
-            state.parentTimeList.forEach((item) => {
-              item.children.forEach((child) => {
-                if (child.from === brand_code && child.day == day) {
-                  state.activeIds.push(child.id);
-                  child.is_show = true;
-                }
-              });
-            });
-          });
-        }
-      });
+      }
     };
     const handlePopup = async () => {
       state.show = false;
       var choosebrandList = [];
-      state.parentTimeList.forEach((item) => {
-        item.children.forEach((child) => {
-          if (child.is_show) {
-            choosebrandList.push(child.from + " " + child.day);
-          }
-        });
+      state.curBrandList.forEach((item) => {
+          choosebrandList.push(item + " " + state.curTime);
       });
       if (choosebrandList.length === 0) {
         state.info.is_all_see = "1";
@@ -322,49 +310,40 @@ export default {
       console.log(choosebrandList.toString());
     };
     const onSave = async () => {
-     
-          const params = {
-            address: state.info.address,
-            name: state.info.name,
-            phone: state.info.phone,
-            mianji: state.info.mianji,
-            style: state.info.style,
-            jieduan: state.info.jieduan,
-          };
+      const params = {
+        address: state.info.address,
+        name: state.info.name,
+        phone: state.info.phone,
+        mianji: state.info.mianji,
+        style: state.info.style,
+        jieduan: state.info.jieduan,
+      };
 
-          var done = true;
-          var result = "";
-          for (var item in params) {
-            if (done === false) {
-              return;
-            }
+      var done = true;
+      var result = "";
+      for (var item in params) {
+        if (done === false) {
+          return;
+        }
 
-            result = verify(item, params[item]);
-            if (!result.done) {
-              Toast.fail(result.value);
-            }
-            done = result.done;
-          }
-          if (!done) {
-            return;
-          }
-          if (
-            !/^[1]([3-9])[0-9]{9}$/.test(
-              state.info.phone
-            )
-          ) {
-            return Toast.fail("请输入正确的手机号");
-          }
-          if (state.info.phone2) {
-            if (
-              !/^[1]([3-9])[0-9]{9}$/.test(
-                state.info.phone2
-              )
-            ) {
-              return Toast.fail("请输入正确的手机号");
-            }
-          }
-           Dialog.confirm({
+        result = verify(item, params[item]);
+        if (!result.done) {
+          Toast.fail(result.value);
+        }
+        done = result.done;
+      }
+      if (!done) {
+        return;
+      }
+      if (!/^[1]([3-9])[0-9]{9}$/.test(state.info.phone)) {
+        return Toast.fail("请输入正确的手机号");
+      }
+      if (state.info.phone2) {
+        if (!/^[1]([3-9])[0-9]{9}$/.test(state.info.phone2)) {
+          return Toast.fail("请输入正确的手机号");
+        }
+      }
+      Dialog.confirm({
         title: "温馨提示",
         message: `确定${state.type == "add" ? "发布" : "更新"}吗`,
       })
@@ -380,7 +359,6 @@ export default {
             setTimeout(() => {
               window.location.reload();
             }, 1100);
-            
           });
           // 数据返回有问题
           // setTimeout(() => {
@@ -396,27 +374,14 @@ export default {
     const handleGoRouter = async (path, query) => {
       router.push({ path: path, query: query });
     };
-    const handleTree = async (item) => {
-      state.activeIds = [];
-      state.parentTimeList.forEach((list) => {
-        if (list.day != item.day) return;
-        list.children.forEach((see) => {
-          if (item.id === see.id) {
-            list.is_show = !see.is_show;
-            see.is_show = !see.is_show;
-          } else {
-            // see.is_show = false;
-          }
-        });
-      });
-      state.parentTimeList.forEach((list) => {
-        list.children.forEach((see) => {
-          if (see.is_show) {
-            state.activeIds.push(see.id);
-          }
-        });
-      });
-    };
+   
+    const handleTreeChoose = async(item) => {
+      if(state.curBrandList.indexOf(item) > -1) {
+        state.curBrandList.splice(item,1)
+      } else {
+        state.curBrandList.push(item)
+      }
+    }
     return {
       items,
       activeIndex,
@@ -424,10 +389,10 @@ export default {
       onSave,
       handleSelectBrand,
       handleGetInfo,
-      handleTree,
       handlePopup,
       handleGetTimeList,
       handleGoRouter,
+      handleTreeChoose
     };
   },
 };
