@@ -319,8 +319,7 @@ export default {
       handleRead,
       handleUpdateStatus,
       handleGetLogList,
-      handleGoRouter,
-      checkInfo
+      handleGoRouter
     };
   },
 };
