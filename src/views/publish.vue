@@ -16,15 +16,33 @@
       >
         <van-swipe-item v-for="(item, index) in logList" :key="index"
           >{{ item.create_time }} {{ item.brand_name }}查看了此信息,{{
-            item.status == "0" ? "未跟进" : item.status == "1" ? "已跟进" : item.status == "2" ? "已放弃" : item.status == "3" ? "已成交" : ""
-          }}&nbsp;&nbsp;<span @click="handleGoRouter('logList',{id:item.id,info_id:item.info_id,selfBrandCode:self_brand_code,brandCode:brand_code})">查看</span></van-swipe-item
+            item.status == "0"
+              ? "未跟进"
+              : item.status == "1"
+              ? "已跟进"
+              : item.status == "2"
+              ? "已放弃"
+              : item.status == "3"
+              ? "已成交"
+              : ""
+          }}&nbsp;&nbsp;<span
+            @click="
+              handleGoRouter('logList', {
+                id: item.id,
+                info_id: item.info_id,
+                selfBrandCode: self_brand_code,
+                brandCode: brand_code,
+              })
+            "
+            >查看</span
+          ></van-swipe-item
         >
       </van-swipe>
     </van-notice-bar>
     <div class="van-address-edit">
       <div class="">
         <van-form>
-          <van-cell-group  >
+          <van-cell-group>
             <van-field
               v-model="info.address"
               rows="2"
@@ -73,7 +91,7 @@
               label="*装修风格"
               placeholder="请输入装修风格"
             />
-             <van-field name="radio" label="装修阶段">
+            <van-field name="radio" label="装修阶段">
               <template #input>
                 <van-radio-group v-model="info.jieduan" direction="horizontal">
                   <van-radio name="0">刚开工</van-radio>
@@ -120,9 +138,7 @@
                   <van-radio name="0" @click="handleSelectBrand"
                     >指定可见</van-radio
                   >
-                   <van-radio name="2" 
-                    >取消可见</van-radio
-                  >
+                  <van-radio name="2">取消可见</van-radio>
                 </van-radio-group>
               </template>
             </van-field>
@@ -171,6 +187,8 @@ import { reactive, onMounted, toRefs, ref } from "vue";
 import { Toast } from "vant";
 import sHeader from "@/components/SimpleHeader";
 import { useRoute, useRouter } from "vue-router";
+import { Dialog } from "vant";
+
 import {
   editInfo,
   addInfo,
@@ -197,16 +215,16 @@ export default {
       show: false,
       activeIds: [],
       logList: [],
-      brandList: [],
-      brand_code:"",
-      self_brand_code:"",
+      brand_code: "",
+      self_brand_code: "",
       parentTimeList: [
-        {text:"当天可见",id:1,day:1},
-        {text:"3天可见",id:2,day:3},
-        {text:"7天可见",id:3,day:7},
+        { text: "当天可见", id: 1, day: 1 },
+        { text: "3天可见", id: 2, day: 3 },
+        { text: "7天可见", id: 3, day: 7 },
       ],
       id: "",
-      info_id:"",
+      info_id: "",
+      timeList: [],
       info: {
         address: "",
         nature: "0",
@@ -221,19 +239,13 @@ export default {
     });
 
     onMounted(async () => {
-      const { type, id,info_id,brandCode } = route.query;
+      const { type, id, info_id, brandCode } = route.query;
       state.type = type;
       state.id = id || "";
       state.self_brand_code = getLocal("brand_code");
       state.info_id = info_id;
       state.brand_code = brandCode;
-      state.brandList = JSON.parse(getLocal("brandList"));
-      state.brandList.forEach((item,index)=>{
-        if(item.brand_code === state.self_brand_code) {
-          state.brandList.splice(index,1)
-        }
-      })
-      console.log(state.brandList)
+
       if (id) {
         await handleGetInfo();
         handleGetLogList();
@@ -263,16 +275,14 @@ export default {
     const handleGetTimeList = async () => {
       await getTimeList().then((data) => {
         state.timeList = data.list;
-        state.timeList.forEach((item,index)=>{
-          if(item.from === state.self_brand_code) {
-            state.timeList.splice(index,1)
-          }
-        })
+        state.timeList = state.timeList.filter(
+          (item) => item.from !== state.self_brand_code
+        );
         state.parentTimeList.forEach((item) => {
           item.is_show = false;
           item.children = [];
           state.timeList.forEach((time) => {
-            if ( parseInt(time.day) ===item.day ) {
+            if (parseInt(time.day) === item.day) {
               time.is_show = item.is_show === "1";
               item.children.push(time);
             }
@@ -293,10 +303,7 @@ export default {
             });
           });
         }
-      
       });
-     
-       
     };
     const handlePopup = async () => {
       state.show = false;
@@ -315,72 +322,80 @@ export default {
       console.log(choosebrandList.toString());
     };
     const onSave = async () => {
-      console.log(state.info);
-      const params = {
-        address: state.info.address,
-        name: state.info.name,
-        phone: state.info.phone,
-        mianji: state.info.mianji,
-        style: state.info.style,
-        jieduan: state.info.jieduan,
-      };
+     
+          const params = {
+            address: state.info.address,
+            name: state.info.name,
+            phone: state.info.phone,
+            mianji: state.info.mianji,
+            style: state.info.style,
+            jieduan: state.info.jieduan,
+          };
 
-      var done = true;
-      var result = "";
-      for (var item in params) {
-        if (done === false) {
-          return;
-        }
+          var done = true;
+          var result = "";
+          for (var item in params) {
+            if (done === false) {
+              return;
+            }
 
-        result = verify(item, params[item]);
-        if (!result.done) {
-          Toast.fail(result.value);
-        }
-        done = result.done;
-      }
-      if (!done) {
-        return;
-      }
-      // if (
-      //   !/^(0|86|17951)?(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$/.test(
-      //     state.info.phone
-      //   )
-      // ) {
-      //   return Toast.fail("请输入正确的手机号");
-      // }
-      // if (state.info.phone2) {
-      //   if (
-      //     !/^(0|86|17951)?(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$/.test(
-      //       state.info.phone2
-      //     )
-      //   ) {
-      //     return Toast.fail("请输入正确的手机号");
-      //   }
-      // }
-
-      await (state.type == "add"
-        ? addInfo({ brand_code: state.self_brand_code, ...state.info })
-        : editInfo({ brand_code: state.self_brand_code, ...state.info })
-      ).then(() => {
-        Toast("保存成功");
-        setTimeout(() => {
-          // router.replace({name: "brand"})
+            result = verify(item, params[item]);
+            if (!result.done) {
+              Toast.fail(result.value);
+            }
+            done = result.done;
+          }
+          if (!done) {
+            return;
+          }
+          if (
+            !/^[1]([3-9])[0-9]{9}$/.test(
+              state.info.phone
+            )
+          ) {
+            return Toast.fail("请输入正确的手机号");
+          }
+          if (state.info.phone2) {
+            if (
+              !/^[1]([3-9])[0-9]{9}$/.test(
+                state.info.phone2
+              )
+            ) {
+              return Toast.fail("请输入正确的手机号");
+            }
+          }
+           Dialog.confirm({
+        title: "温馨提示",
+        message: `确定${state.type == "add" ? "发布" : "更新"}吗`,
+      })
+        .then(async () => {
+          await (state.type == "add"
+            ? addInfo({ brand_code: state.self_brand_code, ...state.info })
+            : editInfo({ brand_code: state.self_brand_code, ...state.info })
+          ).then(() => {
+            Toast("保存成功");
+            setTimeout(() => {
+              router.replace({ name: "infoList" });
+            }, 1000);
+            setTimeout(() => {
+              window.location.reload();
+            }, 1100);
+            
+          });
           // 数据返回有问题
-          router.replace({name: "infoList"})
-        }, 1000);
-      });
-      // 数据返回有问题
-      // setTimeout(() => {
-      //   router.back()
-      // }, 1000)
+          // setTimeout(() => {
+          //   router.back()
+          // }, 1000)
+        })
+        .catch(() => {});
     };
 
     const handleSelectBrand = async () => {
       state.show = true;
     };
-    const handleGoRouter = async (path,query) => {
-      router.push({ path: path, query: query})
-    }
+    const handleGoRouter = async (path, query) => {
+      router.push({ path: path, query: query });
+    };
     const handleTree = async (item) => {
       state.activeIds = [];
       state.parentTimeList.forEach((list) => {
@@ -412,7 +427,7 @@ export default {
       handleTree,
       handlePopup,
       handleGetTimeList,
-      handleGoRouter
+      handleGoRouter,
     };
   },
 };
@@ -451,9 +466,9 @@ export default {
   font-size: 12px;
 }
 .popup-comfirm {
-    text-align: right;
-    padding: 10px 20px;
-    font-size: 14px;
-    color: #ee0a24;
+  text-align: right;
+  padding: 10px 20px;
+  font-size: 14px;
+  color: #ee0a24;
 }
 </style>
