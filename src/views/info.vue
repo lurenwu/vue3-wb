@@ -205,19 +205,7 @@ export default {
       handleGetInfo();
       handleGetLogList();
     });
-    const checkInfo = async () =>{
-      var read_num = parseInt(state.userInfo.read_num);
-      if(read_num === 0) {
-        state.tip = '你的可读权限不足，请尽快发布信息。';
-        Toast.fail(state.tip);
-        return false
-      }else if(read_num < 10) {
-        state.tip = '你的可读权限不足10条，请尽快发布信息。';
-        return true
-      } else {
-        return true
-      }
-    }
+   
     const handleDeal = async (status) => {
       Dialog.confirm({
         title: "温馨提示",
@@ -242,7 +230,16 @@ export default {
         }
         setLocal("tipNum", tipNum);
       }
-      if(!checkInfo()) return ;
+      var read_num = parseInt(state.userInfo.read_num);
+      if(read_num === 0) {
+        state.tip = '你的可读权限不足，请尽快发布信息。';
+        Toast.fail(state.tip);
+        return 
+      }
+      if(read_num < 10) {
+        state.tip = '你的可读权限不足10条，请尽快发布信息。';
+        return 
+      } 
       Dialog.confirm({
         title: "温馨提示",
         message: `${state.tip}确定${!result ? "不" : ""}跟进吗`,

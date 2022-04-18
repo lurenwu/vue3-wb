@@ -10,10 +10,10 @@
           <div class="title">累积发布信息总数：{{ echartInfo && echartInfo.info && echartInfo.info.fabuSum }}</div>
         </div>
         <div class="item">
-          <div class="title">累积跟进信息总数： {{ echartInfo && echartInfo.info && echartInfo.info.genjinSum }}</div>
+          <div class="title">累积获取总数： {{ echartInfo && echartInfo.info && echartInfo.info.genjinSum }}</div>
         </div>
         <div class="item">
-          <div class="title">累积获取信息总数：{{ echartInfo && echartInfo.info && echartInfo.info.genjinSum }}</div>
+          <div class="title">累积被获取信息总数：{{ echartInfo && echartInfo.info && echartInfo.info.genjinSum }}</div>
         </div>
         <div class="item">
           <div class="title">成交数量：{{ echartInfo && echartInfo.info && echartInfo.info.genjinSum }}</div>
