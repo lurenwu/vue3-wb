@@ -120,7 +120,7 @@
               class="info-btn btn"
               round
               type="primary"
-              @click="handleFollow(false,true,'0')"
+              @click="handleFollow(true,true,'0')"
             > 
               不跟进
             </van-button>
@@ -210,17 +210,18 @@ export default {
       if(read_num === 0) {
         state.tip = '你的可读权限不足，请尽快发布信息。';
         Toast.fail(state.tip);
-        return
-      }
-      if(read_num < 10) {
+        return false
+      }else if(read_num < 10) {
         state.tip = '你的可读权限不足10条，请尽快发布信息。';
+        return true
+      } else {
+        return true
       }
     }
     const handleDeal = async (status) => {
-      checkInfo();
       Dialog.confirm({
         title: "温馨提示",
-        message: `${state.tip}确定${status == '3' ? "成交" : "放弃"}该信息吗`,
+        message: `确定${status == '3' ? "成交" : "放弃"}该信息吗`,
       })
         .then(async () => {
           handleUpdateStatus(status);
@@ -241,7 +242,7 @@ export default {
         }
         setLocal("tipNum", tipNum);
       }
-      checkInfo();
+      if(!checkInfo()) return ;
       Dialog.confirm({
         title: "温馨提示",
         message: `${state.tip}确定${!result ? "不" : ""}跟进吗`,
