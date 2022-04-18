@@ -57,7 +57,7 @@ export default {
        ctx.emit('callback')
       } else {
         if (!props.back) {
-          router.go(-1)
+          router.back()
         } else {
           router.push({ path: props.back })
         }

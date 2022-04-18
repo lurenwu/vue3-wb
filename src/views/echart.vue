@@ -5,18 +5,35 @@
       <div class="box-wrap">
         <!-- <LineChart style="height:300px" :xAxisData="chartData.xAxisData" :seriesData="chartData.seriesData" /> -->
       </div>
-      <div class="echart-total-item">
+      <div class="echart-total-item" v-if="self_brand_code === 'admin'">
         <div class="item">
           <div class="title">累积发布信息总数：{{ echartInfo && echartInfo.info && echartInfo.info.fabuSum }}</div>
         </div>
         <div class="item">
-          <div class="title">累积获取总数： {{ echartInfo && echartInfo.info && echartInfo.info.huoquSum }}</div>
+          <div class="title">累积获取总数： {{ echartInfo && echartInfo.info && echartInfo.info.genjinSum }}</div>
         </div>
         <div class="item">
-          <div class="title">累积跟进总数：{{ echartInfo && echartInfo.info && echartInfo.info.genjinSum }}</div>
+          <div class="title">累积被获取总数：{{ echartInfo && echartInfo.info && echartInfo.info.brandbeigenjinSum }}</div>
         </div>
         <div class="item">  
           <div class="title">累积成交数量：{{ echartInfo && echartInfo.info && echartInfo.info.chengjiaoSum }}</div>
+        </div>
+      </div>
+      <div class="echart-total-item" v-for="(item, index) in echartInfo.newList" :key="index" v-show="item.brand_code === self_brand_code">
+        <div class="item">
+          <div class="title">{{item.brand_name}}发布总数：{{item.fabuSum || 0}}</div>
+        </div>
+        <div class="item">
+          <div class="title">{{item.brand_name}}获取总数： {{item.brandgenjinSum || 0}}</div>
+        </div>
+        <div class="item">
+          <div class="title">{{item.brand_name}}被获取总数：{{item.brandbeigenjinSum || 0}}</div>
+        </div>
+        <div class="item">  
+          <div class="title">{{item.brand_name}}成交总数：{{item.chengjiaoSum || 0}}</div>
+        </div>
+         <div class="item">  
+          <div class="title">{{item.brand_name}}被成交总数：{{ item.beichengjiaoSum || 0}}</div>
         </div>
       </div>
       <!-- <div class="brand-tongji">
@@ -63,6 +80,7 @@ export default {
     const state = reactive({
       echartInfo: {},
       brandList: [],
+      self_brand_code:""
     });
     const chartData = reactive({
       xAxisData: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
@@ -73,6 +91,8 @@ export default {
     }
     onMounted(async () => {
       state.brandList = JSON.parse(getLocal("brandList"));
+      state.self_brand_code = getLocal("brand_code");
+
       handleGetEchartInfo();
     });
 
@@ -98,6 +118,16 @@ export default {
           state.echartInfo.list2.forEach((element) => {
             if (element.brand_code === brand.brand_code) {
               item["brandgenjinSum"] = element.brandgenjinSum
+            }
+          });
+           state.echartInfo.list3.forEach((element) => {
+            if (element.brand_code === brand.brand_code) {
+              item["chengjiaoSum"] = element.chengjiaoSum
+            }
+          });
+           state.echartInfo.list4.forEach((element) => {
+            if (element.brand_code === brand.brand_code) {
+              item["beichengjiaoSum"] = element.beichengjiaoSum
             }
           });
           item["brand_code"] = brand.brand_code;

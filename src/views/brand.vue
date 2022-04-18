@@ -3,9 +3,7 @@
 <template>
   <div class="seting-box">
     <s-header :name="'品牌列表'" noback center icon-center="icon-weidu2x" icon-right="icon-a-2_huaban1" @center-callback="handleGoRouter('/readList')" @right-callback="handleGoRouter('/publish',{ type: 'add', from:1})"></s-header>
-    <div class="chart-box" v-if="self_brand_code === 'admin'">
-      <i class="iconfont icon-a-dakai1x" @click="handleGoRouter('/echart')"></i>
-    </div>
+   
     <div class="brand-container" v-for="(item, index) in brandList" :key="index"  @click="handleGoRouter('/infoList',{brand_code:item.brand_code})" >
       <div class="brand-item">
         <div class="img">
@@ -109,22 +107,5 @@ export default {
       }
     }
   }
-  .chart-box {
-    position: fixed;
-    z-index: 10;
-    right: 2%;
-    bottom:10%;
-    font-size: 20px;
-    background: #1989fa;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 100%;
-    color: #fff;
-    .iconfont {
-      font-size: 20px;
-    }
-  }
+
 </style>

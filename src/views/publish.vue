@@ -259,7 +259,11 @@ export default {
       state.info_id = info_id;
       state.brand_code = brandCode;
       state.brandList = JSON.parse(getLocal("brandList"));
-
+      state.brandList.forEach((item,index)=>{
+            if(item.brand_code === state.self_brand_code) {
+              state.brandList.splice(index,1)
+            }
+        })
       if (id) {
         await handleGetInfo();
         handleGetLogList();

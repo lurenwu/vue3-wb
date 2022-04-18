@@ -44,7 +44,7 @@ const router = createRouter({
       name: 'infoList',
       component: () => import(/* webpackChunkName: "infoList" */ '@/views/infoList.vue'),
       meta: {
-        index: 1
+        keepAlive: true
       }
     },
     {
