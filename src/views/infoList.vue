@@ -39,7 +39,7 @@ export default {
       from: route.query.from,
       brand_code:"",
       self_brand_code:"",
-      curTab: '0',
+      curTab: '',
       curDone: '1',
       infoList:[],
       brandList: [],
@@ -67,7 +67,7 @@ export default {
           value: '3'
         },
         {
-          title: '已放弃(未跟进)',
+          title: '已放弃',
           value: '2'
         },
         {
