@@ -70,7 +70,7 @@ export default function fetch(options) {
         if(data.data.zt == 0){
           resolve(data.data)
         }  else {
-          Toast.fail("接口("+options.url+")异常,请联系管理员");
+          Toast.fail(data.data.msg);
         }
       })
       .catch((error) => {
